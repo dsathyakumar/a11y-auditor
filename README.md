@@ -4,7 +4,7 @@ This a11y project is an implementation of accessibility rules as defined in
 Accessibility Checklist:
 http://www.w3.org/TR/WCAG10/full-checklist.html
 
-Status : Dev in progress
+Status : Dev (in progress)
 
 
 For AMD Loaders: (if you need a11y as an AMD module)
