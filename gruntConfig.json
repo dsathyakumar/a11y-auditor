@@ -1,0 +1,5 @@
+{
+	"reqJsMainScriptsPath" : "js/mainAMDScripts/main.js",
+	"optFilesBasePath_amd" : "build/amd/",
+	"optFilesBasePath_browser" : "build/browser/main.js"
+}

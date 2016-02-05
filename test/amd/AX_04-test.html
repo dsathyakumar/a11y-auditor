@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<title></title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js"></script>
+		<script src="../../build/amd/main.js"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run("img"));
+			});
+		</script>
+	</head>
+	<body>
+
+		<!-- PASSED : Unique ID exist-->
+		<img alt="jquery" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_1"></img>
+
+		<!-- FAILED : Unique ID doesnt exist-->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="presentation" id="img_4"></img>
+
+		<!-- WARN : No ID exist-->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="xcvdfer"></img>
+
+		<!-- FAILED: Unique ID doesn't exist -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_4"></img>
+
+	</body>
+</html>

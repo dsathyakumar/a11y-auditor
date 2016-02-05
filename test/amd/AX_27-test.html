@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<title>AX-27</title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js" aria-tops="false"></script>
+		<script src="../../build/amd/main.js" aria-hidden="true"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run());
+			});
+		</script>
+	</head>
+	<body>
+
+		<a href="#mainContent1">Skip to main Content</a>
+
+		<div role="main" id="mainContent">
+			This is the main section of the page
+		</div>
+
+	</body>
+</html>

@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>AX-23</title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js"></script>
+		<script src="../../build/amd/main.js"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run());
+			});
+		</script>
+	</head>
+	<body>
+
+		<input type="text" id="txt_1"></input>
+		<br/>
+		<input type="text" id="txt_2" accesskey="u"></input>
+
+	</body>
+</html>

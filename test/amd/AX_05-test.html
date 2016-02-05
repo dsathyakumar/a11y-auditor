@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<title></title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js"></script>
+		<script src="../../build/amd/main.js"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run("img"));
+			});
+		</script>
+	</head>
+	<body>
+
+		<!-- PASSED : NO aria-owns-->
+		<img alt="jquery" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_1"></img>
+
+		<!-- PASSED : NO aria-owns-->
+		<img alt="" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_2"></img>
+
+		<!-- PASSED. As img_2 is used in the aria-owns and is unique -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="presentation" id="img_3" aria-owns="img_2"></img>
+
+		<!-- Failed its one of the many elements that have same ID as part of the aria-owns-->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_4" role="xcvdfer" aria-owns="img_1"></img>
+
+		<!-- Failed its one of the many elements that have same ID as part of the aria-owns-->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_5" aria-owns="img_1"></img>
+
+	</body>
+</html>

@@ -1,0 +1,23 @@
+<html>
+	<head>
+		<title>AX-11</title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../build/browser/main.js"></script>
+		<script>
+
+		$(function() {
+				//> comment to exclude its execution, the resultsObj will be populated with errors - skips AX_01 for selector img
+				console.log(axs.audit.run("img"));
+		});
+		</script>
+	</head>
+	<body>
+
+		<!-- Failed. As img_4 id is present in more than one element -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="presentation" id="img_4"></img>
+
+		<!-- Failed because of invalid role attribute and its one of the many elements that have same ID as part of the aria-owns-->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="xcvdfer" id="img_1"></img>
+
+	</body>
+</html>

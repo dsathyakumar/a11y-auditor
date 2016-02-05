@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<title></title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js"></script>
+		<script src="../../build/amd/main.js"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run("img"));
+			});
+		</script>
+	</head>
+	<body>
+
+
+
+		<!-- Failed. As the idref atribute has an id that is used as the ID of more than one element -->
+		<img alt="" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_3" idref="img_4"></img>
+
+		<!-- Failed. As img_4 id is present in more than one element -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="presentation" id="img_4"></img>
+
+		<!-- Failed because it has the same ID and its one of the many elements that have same ID as part of the aria-owns -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_4"></img>
+
+	</body>
+</html>

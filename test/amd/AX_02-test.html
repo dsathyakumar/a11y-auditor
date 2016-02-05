@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<title></title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js"></script>
+		<script src="../../build/amd/main.js"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run("img"));
+			});
+		</script>
+	</head>
+	<body>
+		<div>
+			<div></div>
+		</div>
+		<!-- PASSED : No specific tab index -->
+		<img alt="jquery" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_1"></img>
+
+		<!-- Failed because of positive value of tab index -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_2" tabindex="2"></img>
+
+		<!-- Passed. Tab Index negative indicates tabing is ignored -->
+		<img alt="" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_3" tabindex="-1"></img>
+
+		<!-- Passed. TAB INDEX OF 0 is the source DOM order. -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="presentation" id="img_4" tabindex="0"></img>
+
+	</body>
+</html>

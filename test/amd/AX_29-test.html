@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>AX-29</title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js" aria-tops="false"></script>
+		<script src="../../build/amd/main.js" aria-hidden="true"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run("body"));
+			});
+		</script>
+	</head>
+	<body>
+
+		<b> This is a bolded text </b>
+
+		<i> This is highlighted text by italics </i>
+
+	</body>
+</html>

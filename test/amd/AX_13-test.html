@@ -1,0 +1,17 @@
+<html>
+	<head>
+		<title></title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js"></script>
+		<script src="../../build/amd/main.js"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run("body"));
+			});
+		</script>
+	</head>
+	<body>
+		<div role="main"></div>
+		<main role="main">This is the main section</main>
+	</body>
+</html>

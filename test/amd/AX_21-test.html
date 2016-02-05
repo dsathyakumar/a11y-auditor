@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<title>AX-21</title>
+		<script src="../../js/jquery/jquery.js"></script>
+		<script src="../../js/require/require.js"></script>
+		<script src="../../build/amd/main.js"></script>
+		<script>
+			require(["main"], function(axs){
+				console.log(axs.audit.run("body"));
+			});
+		</script>
+	</head>
+	<body>
+
+		<a href="www.google.com" id="elem1" target="_blank">Google it</a>
+
+		<a href="www.google.com" id="elem_2">Google it</a>
+
+		<iframe src="http://www.google.com" target="_blank"></iframe>
+
+	</body>
+</html>
