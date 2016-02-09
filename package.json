@@ -13,11 +13,15 @@
     	"type": "git",
     	"url": "https://github.com/dsathyakumar/a11y-auditor"
   	},
-	"dependencies": {
+	"devDependencies": {
 		"grunt": "~0.4.5",
 		"grunt-cli": "~0.1.13",
 		"grunt-contrib-requirejs" : "~0.4.4",
 		"grunt-contrib-concat" : "~0.5.1"
+	},
+	"dependencies" : {
+		"jQuery" : "1.7.4",
+		"lodash" : "^4.3.0"
 	},
 	"license" : "MIT"
 }
