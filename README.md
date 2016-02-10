@@ -4,33 +4,12 @@ This a11y project is an implementation of accessibility rules as defined in
 Accessibility Checklist:
 http://www.w3.org/TR/WCAG10/full-checklist.html
 
-Status : Dev (in progress)
+Status : Dev (in progress), to make it compatible with Front end loading (via AMD loaders and script tag loading)
 
-
-For AMD Loaders: (if you need a11y as an AMD module)
-------------------------------------------------------
-Use the distribution file at build/amd/main.js. Note that AMD loader like Require JS is not bundled along with this distribution file. Include require.js (any AMD loader) before plugging this into the test page. jQuery is not bundled along with this distribution. Please inject jQuery & require JS (AMD loader) into your test page before including this. Implement it as :
-
-```
-require(“main”, function(axs){
-	console.log(axs.audit.run());
-});
-```
-
-
-For Browser usage (include script and run without AMD):
----------------------------------------------------------
-Use the distribution file at build/browser/main.js. This will require jQuery (v 1.11) included before it. Implement it as :
-
-```
-window.onload = function(){
-		axs.audit.run();
-}
-```
 
 For Node JS usage :
 ---------------------------------------------------------
-require the module as require('a11yTester') and add it to the dependencies. This will return the run() function. Use it in your module.
+require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function validator()]. Use it in your module.
 
 ```
 var a11y = require('a11y-auditor');
@@ -40,13 +19,16 @@ var result = a11y(htmlSelector, configRulesObj);
 
 
 
-Method definition of axs.audit.run() :
-----------------------------------------
+Method definition of method exported by the Module :
+--------------------------------------------------
 
-The axs.audit.run() method takes in 2 parameters:
+The method takes in 2 parameters:
 
 ```
-axs.audit.run(htmlSelector,configObject);
+var a11y = require('a11y-auditor');
+
+var result = a11y(htmlSelector, configRulesObj);
+
 ```
 
 1. A valid HTML selector
@@ -81,4 +63,4 @@ To know what each rule does, look at the a11y.properties file.
 Dependencies :
 --------------------
 
-jQuery library (v 1.11)
+jQuery library (v 2.2.0), lodash (4.3.0)
