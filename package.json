@@ -20,8 +20,9 @@
 		"grunt-contrib-concat" : "~0.5.1"
 	},
 	"dependencies" : {
-		"jQuery" : "1.7.4",
-		"lodash" : "^4.3.0"
+		"jquery" : "2.2.0",
+		"lodash" : "^4.3.0",
+		"glob" : "~6.0.4"
 	},
 	"license" : "MIT"
 }
