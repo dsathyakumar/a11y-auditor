@@ -1,5 +1,5 @@
 /****************************************************************
- * This file is the official Grunt File for a11y-auditor APP
+ * Grunt File for a11y-auditor APP
  * Tasks performed :
  * 1. Run JSHint to lint the files.
  * 2. Run grunt-browserify task to convert the files to be front end compatible
