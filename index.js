@@ -2,6 +2,6 @@
 //global.__base = __dirname + '/';
 
 // load the audit runner and export it
-var auditRunner = require("./lib/audit/auditRunner");
+var auditRunner = require('./lib/audit/auditRunner');
 
 module.exports = auditRunner;

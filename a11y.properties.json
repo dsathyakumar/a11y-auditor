@@ -33,8 +33,8 @@
         "AX_30": "Provide text equivalent for every non-text element like OBJECT",
         "AX_31": "Ensure that equivalents for dynamic content are updated when the dynamic content changes. As the contents of a frame changes, so must change any description. This is not possible if an IMG is inserted directly into a frame. Thus, content developers should always make the source ('src') of a frame an HTML file",
         "AX_32": "Use FIELDSET to group form controls into semantic units",
-        "AX_33": "Describe the FIELDSET group with the LEGEND element."
-        "AX_34": "Check for presence of a DOCTYPE"
+        "AX_33": "Describe the FIELDSET group with the LEGEND element.",
+        "AX_34": "Check for presence of a DOCTYPE",
         "AX_35": "Table TD tags are to be associated to corresponding TH header tags of the table via the headers attribute"
     }
 }

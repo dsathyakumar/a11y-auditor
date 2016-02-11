@@ -1,0 +1,12 @@
+{
+    "preset": "airbnb",
+    "validateIndentation": 4,
+    "disallowMultipleVarDecl": null,
+    "requirePaddingNewLinesBeforeLineComments": null,
+    "requirePaddingNewLinesAfterBlocks": null,
+    "validateLineBreaks": null,
+    "requireTrailingComma": null,
+    "requireSpacesInsideObjectBrackets": null,
+    "requireSpacesInAnonymousFunctionExpression": null,
+    "requireDollarBeforejQueryAssignment": null
+}

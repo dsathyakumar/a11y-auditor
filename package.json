@@ -16,18 +16,20 @@
     "devDependencies": {
         "chai": "^3",
         "grunt": "^0",
+        "grunt-browserify": "^4.0.1",
         "grunt-contrib-clean": "^0",
         "grunt-contrib-jshint": "^0",
+        "grunt-contrib-watch": "^0.6.1",
         "grunt-coveralls": "^1.0.0",
         "grunt-docco-plus": "^2.0.0",
         "grunt-env": "^0.4.4",
         "grunt-gh-pages": "^1.0.0",
         "grunt-istanbul": "^0.6.1",
+        "grunt-jscs": "^2.7.0",
+        "grunt-jsonlint": "^1.0.7",
         "grunt-mocha-test": "^0",
         "sinon": "^1.17.3",
-        "sinon-chai": "^2.8.0",
-        "grunt-browserify": "^4.0.1",
-        "grunt-contrib-watch": "^0.6.1"
+        "sinon-chai": "^2.8.0"
     },
     "dependencies": {
         "jquery": "2.2.0",
