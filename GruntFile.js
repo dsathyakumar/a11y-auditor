@@ -137,11 +137,11 @@ module.exports = function(grunt) {
         },
         browserify: {
             main: {
-                src: 'index.js',
+                src: 'a11y-auditor.js',
                 dest: 'dist/a11y-auditor.js',
                 options: {
                     browserifyOptions: {
-                        standalone: 'index'
+                        standalone: "a11y-auditor"
                     }
                 }
             }
