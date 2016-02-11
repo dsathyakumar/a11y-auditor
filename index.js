@@ -1,7 +1,9 @@
 //defining a global root dirname to save the trouble from relative paths
-global.rootRequire = function(name) {
-    return require(__dirname + '/' + name);
-}
+global.__base = __dirname + '/';
 
 //load the audit runner and export it
-module.exports = rootRequire("lib/audit/auditRunner");
+var auditRunner = require("./lib/audit/auditRunner");
+
+console.log(auditRunner);
+
+module.exports = auditRunner;
