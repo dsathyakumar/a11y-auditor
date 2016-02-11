@@ -1,2 +1,4 @@
 # directories
 node_modules/
+.idea
+dist
