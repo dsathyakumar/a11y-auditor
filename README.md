@@ -18,6 +18,15 @@ var result = a11y(htmlSelector, configRulesObj);
 ```
 
 
+For Browser usage (include script and run without AMD):
+---------------------------------------------------------
+Use the distribution file at dist/browser/main.js. Implement it as :
+
+```
+window.onload = function(){
+		a11y-auditor(htmlSelector, configRulesObj);
+}
+```
 
 Method definition of method exported by the Module :
 --------------------------------------------------
