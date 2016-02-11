@@ -30,11 +30,11 @@ module.exports = function(grunt) {
         clean : ['dist/'],
         browserify: {
             main: {
-                src: 'index.js',
+                src: 'a11y-auditor.js',
                 dest: 'dist/browser/ally-auditor.js',
                 options : {
                   browserifyOptions : {
-                    standalone : "index"
+                    standalone : "a11y-auditor"
                   }
                 }
             }
