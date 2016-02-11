@@ -138,7 +138,7 @@ module.exports = function(grunt) {
         browserify: {
             main: {
                 src: 'index.js',
-                dest: 'dist/browser/ally-auditor.js',
+                dest: 'dist/ally-auditor.js',
                 options: {
                     browserifyOptions: {
                         standalone: 'index'
