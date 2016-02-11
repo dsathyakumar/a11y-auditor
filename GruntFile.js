@@ -8,6 +8,9 @@
 
 module.exports = function(grunt) {
 
+    //load the grunt-contrib-clean
+    grunt.loadNpmTasks('grunt-contrib-clean');
+
     //load the grunt watcher
     grunt.loadNpmTasks('grunt-contrib-watch');
 
@@ -24,6 +27,7 @@ module.exports = function(grunt) {
         //jshint: {
           //files: ['Gruntfile.js', 'lib/**/*.js']
         //},
+        clean : ['dist/'],
         browserify: {
             main: {
                 src: 'index.js',
@@ -42,6 +46,6 @@ module.exports = function(grunt) {
     });
 
     //register the grunt tasks that need to be executed
-    grunt.registerTask('default', [/*'jshint', */'browserify', 'watch']);
+    grunt.registerTask('default', [/*'jshint', */'clean', 'browserify', 'watch']);
 
 };
