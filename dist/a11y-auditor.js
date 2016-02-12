@@ -2,58 +2,60 @@
 //defining a global root dirname to save the trouble from relative paths
 //global.__base = __dirname + '/';
 
-//load the audit runner and export it
-var auditRunner = require("./lib/audit/auditRunner");
+// load the audit runner and export it
+var auditRunner = require('./lib/audit/auditRunner');
+
+if (typeof window !== 'undefined') {
+    window.auditRunner = auditRunner;
+}
 
 module.exports = auditRunner;
 
 },{"./lib/audit/auditRunner":2}],2:[function(require,module,exports){
+'use strict';
 //libraries - core modules jQuery and lodash
-var $ = require('jquery'),
-    _ = require('lodash'),
+var $ = require('jquery');
+var _ = require('lodash');
 
-    //modules required from within the app
-    enums = require('../enums/enums'),
-    axsUtils = require('../axs/axsUtils'),
-    rulesExecutor = require("../rulesProcessor/rulesExecutor"),
-    auditRulesCreator = require('../rulesProcessor/auditRulesCreator'),
-    ruleTagNameMapper = require('../mapper/ruleTagNameMapper'),
-    ruleHandlerMapper = require('../mapper/ruleHandlerMapper'),
-    injector = require('../utils/injectDeps');
+//modules required from within the app
+var enums = require('../enums/enums');
+var axsUtils = require('../axs/axsUtils');
+var rulesExecutor = require('../rulesProcessor/rulesExecutor');
+var auditRulesCreator = require('../rulesProcessor/auditRulesCreator');
+var ruleTagNameMapper = require('../mapper/ruleTagNameMapper');
+var ruleHandlerMapper = require('../mapper/ruleHandlerMapper');
+var injector = require('../utils/injectDeps');
 
-    //> at this point the rulesExecutor has the array of rules implementations and the auditRulesCreator is also available
-  (function(auditRulesCreator, rulesExecutor){
+//> at this point the rulesExecutor has the array of rules implementations and the auditRulesCreator is also available
+(function(auditRulesCreator, rulesExecutor) {
     //> so push all the rules into the auditRulesCreator
-    rulesExecutor.forEach(function(element,index,array){
-      auditRulesCreator.addAuditRule(element);
+    rulesExecutor.forEach(function(element) {
+        auditRulesCreator.addAuditRule(element);
     });
-  })(auditRulesCreator, rulesExecutor);
-
+})(auditRulesCreator, rulesExecutor);
 
 var _resultObj = {}, // returns the results of the audit run
     _selectorObjs = {}, // a map that maps an ID to the object extracted from the selectors in the config
     _selectorRules = {}; // a map that maps the same ID to the array of rules to be skipped
 
-
 /***
-* Export this function which takes in a selctor and configObject
-*
-**/
+ * Export this function which takes in a selctor and configObject
+ *
+ **/
 module.exports = function validator(selector, ignoreSpecific) {
 
     //if selector is empty or if its not a valid string or if its undefined
     if (_.isEmpty(selector) && !_.isString(selector) && _.isUndefined(selector)) {
-        selector = "html"; // do the audit for the whole document
+        selector = 'html'; // do the audit for the whole document
     }
     if ($(selector).length === 0) { //check if the selector gets some DOM element
-        throw new Error("Not a valid selector. Or no matching DOM Elements!")
+        throw new Error('Not a valid selector. Or no matching DOM Elements!');
     } else {
         //if ignoreSpecific is not empty & not undefined
         if (!_.isEmpty(ignoreSpecific) && !_.isUndefined(ignoreSpecific)) {
             // check if its a valid object
             if (!_.isObject(ignoreSpecific)) {
-                throw new Error("Configuration options passed is not a valid object");
-                return;
+                throw new Error('Configuration options passed is not a valid object');
             }
             //> pre-process - do tasks on the config options object that is passed
             _preProcess(ignoreSpecific);
@@ -65,17 +67,15 @@ module.exports = function validator(selector, ignoreSpecific) {
         //> return the results object
         return _resultObj;
     }
-}
-
-
+};
 
 //> This creates two maps ->
 //> 1) a list of objects extracted from the selectors mentioned in the config object.
 //> 2) A second map that contains the list of rules
 //> The keys for both the maps are the same -> object.toString() + Random Alphanumeric
-function _preProcess(config) {
+var _preProcess = function _preProcess(config) {
     var _obj, _ct, _rand;
-    //> the config is a "selector" -> ["array of rules to be skipped"]
+    //> the config is a 'selector' -> ['array of rules to be skipped']
     for (var currentSelector in config) {
         //> get the array of corresponding objects
         _obj = $(currentSelector).get();
@@ -95,14 +95,16 @@ function _preProcess(config) {
 }
 
 //> generates a random alpha numeric
-function _randomString(length, chars) {
+var _randomString = function _randomString(length, chars) {
     var result = '';
-    for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+    for (var i = length; i > 0; --i) {
+        result += chars[Math.round(Math.random() * (chars.length - 1))];
+    }
     return result;
 }
 
 //> initiates the audit over an array of selectors
-function _auditRunner(selectorArr) {
+var _auditRunner = function _auditRunner(selectorArr) {
     var _count = 0;
     //iterate over the selectorArr and process every selector and its child
     while (_count < selectorArr.length) {
@@ -119,11 +121,11 @@ function _auditRunner(selectorArr) {
 }
 
 //> function to run global rules
-function _globalExecutors() {
+var _globalExecutors = function _globalExecutors() {
     var _globalRules = auditRulesCreator.getGlobalRules(),
         _handler, _result;
     if (!_.isEmpty(_globalRules)) {
-        injector.register("elem", undefined);
+        injector.register('elem', undefined);
         _.forEach(_globalRules, function(value, key) {
             _handler = value.handler;
             _result = injector.process(_handler);
@@ -137,7 +139,7 @@ function _globalExecutors() {
 }
 
 //> process every individual selector from the selector Array
-function _process(elem) {
+var _process = function _process(elem) {
     var _rulesArr, _fn, _result;
     //get the array of rules corresponding to the tagName to execute (tagName <->['Rule1', 'Rule2'])
     _rulesArr = ruleTagNameMapper.getTagHandlers(elem.tagName);
@@ -145,10 +147,11 @@ function _process(elem) {
     //check if the _rulesArr is empty before iterating
     if (!_.isEmpty(_rulesArr) && !_.isUndefined(_rulesArr)) {
         //inject the element as one of the dependencies into the injector
-        injector.register("elem", elem);
+        injector.register('elem', elem);
         //iterate over the rules array index being index of the array and value being the rule
         $.each(_rulesArr, function(index, value) {
-            //for every rule in the rulesArray for the given tag, get the corresponding handler function (ruleID <-> handler)
+            //for every rule in the rulesArray for the given tag, get the corresponding handler function (ruleID <->
+            // handler)
             if (!_isSkipRule(value, elem)) {
                 _fn = ruleHandlerMapper.getHandler(value);
                 _result = injector.process(_fn);
@@ -160,10 +163,10 @@ function _process(elem) {
             }
         });
     }
-}
+};
 
 //> check if the rule execution must be skipped based on presence of rules against selector in config object
-function _isSkipRule(rule, elem) {
+var _isSkipRule = function _isSkipRule(rule, elem) {
     var _ruleList, _ct, _isSkip = false;
     //> iterate over the list of objects in the _selectorObjs which was populated from the config
     for (var _obj in _selectorObjs) {
@@ -173,7 +176,7 @@ function _isSkipRule(rule, elem) {
             _ruleList = _selectorRules[_obj];
             //> check if the current rule exists in the list of rules to be skipped or if * means skip all
             for (_ct = 0; _ct < _ruleList.length; _ct++) {
-                if (_ruleList[_ct] === rule || _ruleList[_ct] === "*") {
+                if (_ruleList[_ct] === rule || _ruleList[_ct] === '*') {
                     _isSkip = true;
                     break; //> since the rule is found, break this loop
                 }
@@ -182,10 +185,10 @@ function _isSkipRule(rule, elem) {
         }
     }
     return _isSkip;
-}
+};
 
 //> This one console.logs the error info for the rule and the element for which it failed
-function _populateErrors(ruleInfoObj, element, errorObj) {
+var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
     var _key = (!_.isEmpty(element)) ? (_.isEmpty(element.id) ? element.tagName : element.id) : ruleInfoObj.ruleID;
     _resultObj[_key] = _resultObj[_key] || [];
     _resultObj[_key].push({
@@ -195,7 +198,7 @@ function _populateErrors(ruleInfoObj, element, errorObj) {
         ruleID: ruleInfoObj.ruleID,
         attr: (!_.isEmpty(element)) ? element.attributes : null
     });
-}
+};
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"../mapper/ruleHandlerMapper":8,"../mapper/ruleTagNameMapper":9,"../rulesProcessor/auditRulesCreator":45,"../rulesProcessor/rulesExecutor":46,"../utils/injectDeps":48,"jquery":49,"lodash":50}],3:[function(require,module,exports){
 /***************************************************************************************
@@ -261,7 +264,7 @@ for (var a in enums.ariaPropertiesEnum) {
 enums.globalPropertiesEnum = enums.ariaRolesEnum.roletype.propertiesSet;
 
 //> exposed exported object that will be consumed by other modules
-module.exports =  {
+module.exports = {
 
     getTextFromHostLanguageAttributes: function(a, b, c, d) {
         if (this.matchSelector(a, "img") && a.hasAttribute("alt")) {
@@ -273,7 +276,9 @@ module.exports =  {
             c ? e.unused = !0 : c = e.text;
             b.alt = e;
         }
-        if (this.matchSelector(a, 'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), video:not([disabled])') && !d) {
+        if (this.matchSelector(a,
+                'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), video:not([disabled])') &&
+            !d) {
             if (a.hasAttribute("id")) {
                 d = document.querySelectorAll('label[for="' + a.id + '"]');
                 for (var e = {}, f = [], g = [], h = 0; h < d.length; h++) {
@@ -286,7 +291,9 @@ module.exports =  {
                     k.element = m;
                     f.push(k);
                 }
-                0 < f.length && (f[f.length - 1].last = !0, e.values = f, e.text = g.join(" "), e.lastWord = this.getLastWord(e.text), c ? e.unused = !0 : c = e.text, b.labelFor = e);
+                0 < f.length &&
+                (f[f.length - 1].last = !0, e.values = f, e.text = g.join(" "), e.lastWord = this.getLastWord(e.text), c
+                    ? e.unused = !0 : c = e.text, b.labelFor = e);
             }
             d = this.parentElement(a);
             for (e = {}; d;) {
@@ -311,19 +318,19 @@ module.exports =  {
 
     asElement: function(a) {
         switch (a.nodeType) {
-            case Node.COMMENT_NODE:
+        case Node.COMMENT_NODE:
+            break;
+        case Node.ELEMENT_NODE:
+            if ("script" == a.localName || "template" == a.localName) {
                 break;
-            case Node.ELEMENT_NODE:
-                if ("script" == a.localName || "template" == a.localName) {
-                    break;
-                }
-                return a;
-            case Node.DOCUMENT_FRAGMENT_NODE:
-                return a.host;
-            case Node.TEXT_NODE:
-                return this.parentElement(a);
-            default:
-                console.warn("Unhandled node type: ", a.nodeType);
+            }
+            return a;
+        case Node.DOCUMENT_FRAGMENT_NODE:
+            return a.host;
+        case Node.TEXT_NODE:
+            return this.parentElement(a);
+        default:
+            console.warn("Unhandled node type: ", a.nodeType);
         }
         return null;
     },
@@ -362,10 +369,10 @@ module.exports =  {
             return null;
         }
         switch (a.nodeType) {
-            case Node.ELEMENT_NODE:
-                return a;
-            default:
-                return this.parentElement(a);
+        case Node.ELEMENT_NODE:
+            return a;
+        default:
+            return this.parentElement(a);
         }
     },
 
@@ -377,11 +384,13 @@ module.exports =  {
             var b = !0
         }
         var c = window.getComputedStyle(a, null);
-        return "none" == c.display || "hidden" == c.visibility ? !0 : a.hasAttribute("aria-hidden") && "true" == a.getAttribute("aria-hidden").toLowerCase() ? !b : !1;
+        return "none" == c.display || "hidden" == c.visibility ? !0 : a.hasAttribute("aria-hidden") &&
+        "true" == a.getAttribute("aria-hidden").toLowerCase() ? !b : !1;
     },
 
     isElementOrAncestorHidden: function(a) {
-        return this.isElementHidden(a) ? !0 : this.parentElement(a) ? this.isElementOrAncestorHidden(this.parentElement(a)) : !1;
+        return this.isElementHidden(a) ? !0 : this.parentElement(a) ? this.isElementOrAncestorHidden(
+            this.parentElement(a)) : !1;
     },
 
     getLastWord: function(a) {
@@ -395,7 +404,8 @@ module.exports =  {
 
     elementIsHtmlControl: function(a) {
         var b = a.ownerDocument.defaultView;
-        return a instanceof b.HTMLButtonElement || a instanceof b.HTMLInputElement || a instanceof b.HTMLSelectElement || a instanceof b.HTMLTextAreaElement ? !0 : !1;
+        return a instanceof b.HTMLButtonElement || a instanceof b.HTMLInputElement ||
+        a instanceof b.HTMLSelectElement || a instanceof b.HTMLTextAreaElement ? !0 : !1;
     },
 
     getTextFromAriaLabelledby: function(a, b) {
@@ -404,26 +414,29 @@ module.exports =  {
             return c;
         }
         for (var d = a.getAttribute("aria-labelledby").split(/\s+/), e = {
-                valid: !0
-            }, f = [], g = [], h = 0; h < d.length; h++) {
+            valid: !0
+        }, f = [], g = [], h = 0; h < d.length; h++) {
             var k = {
                     type: "element"
                 },
                 m = d[h];
             k.value = m;
             var l = document.getElementById(m);
-            l ? (k.valid = !0, k.text = this.findTextAlternatives(l, {}, !0, !0), k.lastWord = this.getLastWord(k.text), f.push(k.text), k.element = l) : (k.valid = !1, e.valid = !1, k.errorMessage = {
+            l ? (k.valid = !0, k.text = this.findTextAlternatives(l, {}, !0, !0), k.lastWord = this.getLastWord(
+                k.text), f.push(k.text), k.element = l) : (k.valid = !1, e.valid = !1, k.errorMessage = {
                 messageKey: "noElementWithId",
                 args: [m]
             });
             g.push(k);
         }
-        0 < g.length && (g[g.length - 1].last = !0, e.values = g, e.text = f.join(" "), e.lastWord = this.getLastWord(e.text), c = e.text, b.ariaLabelledby = e);
+        0 < g.length && (g[g.length - 1].last = !0, e.values = g, e.text = f.join(" "), e.lastWord = this.getLastWord(
+            e.text), c = e.text, b.ariaLabelledby = e);
         return c;
     },
 
     elementIsAriaWidget: function(a) {
-        return a.hasAttribute("role") && (a = a.getAttribute("role")) && (a = enums.ariaRolesEnum[a]) && "widget" in a.allParentRolesSet ? !0 : !1;
+        return a.hasAttribute("role") && (a = a.getAttribute("role")) && (a = enums.ariaRolesEnum[a]) &&
+        "widget" in a.allParentRolesSet ? !0 : !1;
     },
 
     findTextAlternatives: function(a, b, c, d) {
@@ -448,7 +461,8 @@ module.exports =  {
             a ? f.unused = !0 : e && this.elementIsHtmlControl(c) || (a = f.text);
             b.ariaLabel = f;
         }
-        c.hasAttribute("role") && "presentation" == c.getAttribute("role") || (a = this.getTextFromHostLanguageAttributes(c, b, a, e));
+        c.hasAttribute("role") && "presentation" == c.getAttribute("role") ||
+        (a = this.getTextFromHostLanguageAttributes(c, b, a, e));
         if (e && this.elementIsHtmlControl(c)) {
             f = c.ownerDocument.defaultView;
             if (c instanceof f.HTMLInputElement) {
@@ -479,7 +493,8 @@ module.exports =  {
                 });
             }
             if ("menu" == e) {
-                for (var h = c.querySelectorAll("[role=menuitemcheckbox], [role=menuitemradio]"), f = [], g = 0; g < h.length; g++) {
+                for (var h = c.querySelectorAll("[role=menuitemcheckbox], [role=menuitemradio]"), f = [], g = 0;
+                    g < h.length; g++) {
                     "true" == h[g].getAttribute("aria-checked") && f.push(h[g]);
                 }
                 if (0 < f.length) {
@@ -500,14 +515,16 @@ module.exports =  {
             b.controlValue && (f = b.controlValue, a ? f.unused = !0 : a = f.text);
         }
         f = !0;
-        c.hasAttribute("role") && (e = c.getAttribute("role"), (e = enums.ariaRolesEnum[e]) && (!e.namefrom || 0 > e.namefrom.indexOf("contents")) && (f = !1));
+        c.hasAttribute("role") && (e = c.getAttribute("role"), (e = enums.ariaRolesEnum[e]) &&
+        (!e.namefrom || 0 > e.namefrom.indexOf("contents")) && (f = !1));
         (d = this.getTextFromDescendantContent(c, d)) && f && (e = {
             type: "text"
         }, e.text = d, e.lastWord = this.getLastWord(e.text), a ? e.unused = !0 : a = d, b.content = e);
         c.hasAttribute("title") && (d = {
             type: "string",
             valid: !0
-        }, d.text = c.getAttribute("title"), d.lastWord = this.getLastWord(d.lastWord), a ? d.unused = !0 : a = d.text, b.title = d);
+        }, d.text = c.getAttribute("title"), d.lastWord = this.getLastWord(d.lastWord), a ? d.unused = !0
+            : a = d.text, b.title = d);
         return 0 == Object.keys(b).length && null == a ? null : a;
     },
 
@@ -519,7 +536,10 @@ module.exports =  {
         if (d.length) {
             c = "";
             for (e = 0; e < d.length; e++) {
-                c = [c, d[e]].join(" ").trim();
+                c = [
+                    c,
+                    d[e]
+                ].join(" ").trim();
             }
             return c;
         }
@@ -582,47 +602,55 @@ module.exports =  {
             return d.valid = !1, d.reason = '"' + a + '" is not a valid ARIA property', d;
         }
         switch (e) {
-            case "idref":
-                a = this.isValidIDRefValue(b, c), d.valid = a.valid, d.reason = a.reason, d.idref = a.idref;
-            case "idref_list":
-                a = b.split(/\s+/);
-                d.valid = !0;
-                for (b = 0; b < a.length; b++) {
-                    e = this.isValidIDRefValue(a[b], c), e.valid || (d.valid = !1), d.values ? d.values.push(e) : d.values = [e];
-                }
-                return d;
-            case "integer":
-                c = this.isValidNumber(b);
-                if (!c.valid) {
-                    return d.valid = !1, d.reason = c.reason, d;
-                }
-                Math.floor(c.value) !== c.value ? (d.valid = !1, d.reason = "" + b + " is not a whole integer") : (d.valid = !0, d.value = c.value);
-                return d;
-            case "decimal":
-                ;
-            case "number":
-                c = this.isValidNumber(b);
-                d.valid = c.valid;
-                if (!c.valid) {
-                    return d.reason = c.reason, d;
-                }
-                d.value = c.value;
-                return d;
-            case "string":
-                return d.valid = !0, d.value = b, d;
-            case "token":
-                return c = this.isValidTokenValue(a, b.toLowerCase()), c.valid ? (d.valid = !0, d.value = c.value) : (d.valid = !1, d.value = b, d.reason = c.reason), d;
-            case "token_list":
-                e = b.split(/\s+/);
-                d.valid = !0;
-                for (b = 0; b < e.length; b++) {
-                    c = this.isValidTokenValue(a, e[b].toLowerCase()), c.valid || (d.valid = !1, d.reason ? (d.reason = [d.reason], d.reason.push(c.reason)) : (d.reason = c.reason, d.possibleValues = c.possibleValues)), d.values ? d.values.push(c.value) : d.values = [c.value];
-                }
-                return d;
-            case "tristate":
-                return c = this.isPossibleValue(b.toLowerCase(), enums.mixedValuesEnum, a), c.valid ? (d.valid = !0, d.value = c.value) : (d.valid = !1, d.value = b, d.reason = c.reason), d;
-            case "boolean":
-                return c = this.isValidBoolean(b), c.valid ? (d.valid = !0, d.value = c.value) : (d.valid = !1, d.value = b, d.reason = c.reason), d;
+        case "idref":
+            a = this.isValidIDRefValue(b, c), d.valid = a.valid, d.reason = a.reason, d.idref = a.idref;
+        case "idref_list":
+            a = b.split(/\s+/);
+            d.valid = !0;
+            for (b = 0; b < a.length; b++) {
+                e = this.isValidIDRefValue(a[b], c), e.valid || (d.valid = !1), d.values ? d.values.push(e)
+                    : d.values = [e];
+            }
+            return d;
+        case "integer":
+            c = this.isValidNumber(b);
+            if (!c.valid) {
+                return d.valid = !1, d.reason = c.reason, d;
+            }
+            Math.floor(c.value) !== c.value ? (d.valid = !1, d.reason = "" + b + " is not a whole integer")
+                : (d.valid = !0, d.value = c.value);
+            return d;
+        case "decimal":
+            ;
+        case "number":
+            c = this.isValidNumber(b);
+            d.valid = c.valid;
+            if (!c.valid) {
+                return d.reason = c.reason, d;
+            }
+            d.value = c.value;
+            return d;
+        case "string":
+            return d.valid = !0, d.value = b, d;
+        case "token":
+            return c = this.isValidTokenValue(a, b.toLowerCase()), c.valid ? (d.valid = !0, d.value = c.value)
+                : (d.valid = !1, d.value = b, d.reason = c.reason), d;
+        case "token_list":
+            e = b.split(/\s+/);
+            d.valid = !0;
+            for (b = 0; b < e.length; b++) {
+                c = this.isValidTokenValue(a, e[b].toLowerCase()), c.valid ||
+                (d.valid = !1, d.reason ? (d.reason = [d.reason], d.reason.push(c.reason))
+                    : (d.reason = c.reason, d.possibleValues = c.possibleValues)), d.values ? d.values.push(c.value)
+                    : d.values = [c.value];
+            }
+            return d;
+        case "tristate":
+            return c = this.isPossibleValue(b.toLowerCase(), enums.mixedValuesEnum, a), c.valid
+                ? (d.valid = !0, d.value = c.value) : (d.valid = !1, d.value = b, d.reason = c.reason), d;
+        case "boolean":
+            return c = this.isValidBoolean(b), c.valid ? (d.valid = !0, d.value = c.value)
+                : (d.valid = !1, d.value = b, d.reason = c.reason), d;
         }
         d.valid = !1;
         d.reason = "Not a valid ARIA property";
@@ -676,9 +704,9 @@ module.exports =  {
             return null;
         }
         for (var c = c.split(" "), d = {
-                roles: [],
-                valid: !1
-            }, e = 0; e < c.length; e++) {
+            roles: [],
+            valid: !1
+        }, e = 0; e < c.length; e++) {
             var f = c[e],
                 g = enums.ariaRolesEnum[f],
                 f = {
@@ -723,7 +751,10 @@ module.exports =  {
             var h = e[g];
             if (h.details && h.details.propertiesSet) {
                 for (d in h.details.propertiesSet) {
-                    d in c || (a.hasAttribute(d) ? (f = a.getAttribute(d), c[d] = this.getAriaPropertyValue(d, f, a), "values" in c[d] && (f = c[d].values, f[f.length - 1].isLast = !0)) : h.details.requiredPropertiesSet[d] && (c[d] = {
+                    d in c ||
+                    (a.hasAttribute(d) ? (f = a.getAttribute(d), c[d] = this.getAriaPropertyValue(d, f, a), "values" in
+                    c[d] && (f = c[d].values, f[f.length - 1].isLast = !0)) : h.details.requiredPropertiesSet[d] &&
+                    (c[d] = {
                         name: d,
                         valid: !1,
                         reason: "Required property not set"
@@ -734,7 +765,6 @@ module.exports =  {
         0 < Object.keys(c).length && (b.properties = this.values(c));
         return 0 < Object.keys(b).length ? b : null;
     },
-
 
     getGlobalAriaProperties: function(a) {
         var b = {},
@@ -749,7 +779,8 @@ module.exports =  {
     },
 
     matchSelector: function(a, b) {
-        return a.matches ? a.matches(b) : a.webkitMatchesSelector ? a.webkitMatchesSelector(b) : a.mozMatchesSelector ? a.mozMatchesSelector(b) : a.msMatchesSelector ? a.msMatchesSelector(b) : !true;
+        return a.matches ? a.matches(b) : a.webkitMatchesSelector ? a.webkitMatchesSelector(b) : a.mozMatchesSelector
+            ? a.mozMatchesSelector(b) : a.msMatchesSelector ? a.msMatchesSelector(b) : !true;
     },
 
     isValidNumber: function(a) {
@@ -774,46 +805,218 @@ module.exports =  {
 };
 
 },{"../enums/enums":7}],4:[function(require,module,exports){
-var _validArriaAttributesArr = ["aria-activedescendant", "aria-atomic",
-    "aria-autocomplete", "aria-busy", "aria-checked",
-    "aria-controls", "aria-describedby", "aria-disabled",
-    "aria-dropeffect", "aria-expanded", "aria-flowto", "aria-grabbed",
-    "aria-haspopup", "aria-hidden", "aria-invalid",
-    "aria-label", "aria-labelledby", "aria-level", "aria-live",
-    "aria-multiline", "aria-multiselectable", "aria-orientation",
-    "aria-owns", "aria-posinset", "aria-pressed", "aria-readonly",
-    "aria-relevant", "aria-required", "aria-selected", "aria-setsize",
-    "aria-sort", "aria-valuemax", "aria-valuemin", "aria-valuenow",
+var _validArriaAttributesArr = [
+    "aria-activedescendant",
+    "aria-atomic",
+    "aria-autocomplete",
+    "aria-busy",
+    "aria-checked",
+    "aria-controls",
+    "aria-describedby",
+    "aria-disabled",
+    "aria-dropeffect",
+    "aria-expanded",
+    "aria-flowto",
+    "aria-grabbed",
+    "aria-haspopup",
+    "aria-hidden",
+    "aria-invalid",
+    "aria-label",
+    "aria-labelledby",
+    "aria-level",
+    "aria-live",
+    "aria-multiline",
+    "aria-multiselectable",
+    "aria-orientation",
+    "aria-owns",
+    "aria-posinset",
+    "aria-pressed",
+    "aria-readonly",
+    "aria-relevant",
+    "aria-required",
+    "aria-selected",
+    "aria-setsize",
+    "aria-sort",
+    "aria-valuemax",
+    "aria-valuemin",
+    "aria-valuenow",
     "aria-valuetext"
 ];
 
 module.exports = _validArriaAttributesArr;
 
 },{}],5:[function(require,module,exports){
-var _tagNamesArr = ["A", "ABBR", "ACRONYM", "ADDRESS", "APPLET", "AREA", "B",
-                    "BASEFONT", "BDO", "BGSOUND", "BIG", "BLOCKQUOTE", "BLINK",
-                    "BODY", "BR", "BUTTON", "CAPTION", "CENTER", "CITE", "CODE",
-                    "COL", "COLGROUP", "DD", "DFN", "DEL", "DIR", "DIV", "DL", "DT",
-                    "EMBED", "EM", "FIELDSET", "FONT", "FORM", "FRAME", "FRAMESET",
-                    "H1", "H2", "H3", "H4", "H5", "H6", "HEAD", "HR", "HTML", "IMG",
-                    "IFRAME", "INPUT", "INS", "ISINDEX", "I", "KBD", "LABEL", "LEGEND",
-                    "LI", "LINK", "MARQUEE", "MENU", "META", "NOFRAME", "NOSCRIPT",
-                    "OPTGROUP", "OPTION", "OL", "P", "Q", "PRE", "S", "SAMP", "SCRIPT",
-                    "SELECT", "SMALL", "SPAN", "STRIKE", "STRONG", "STYLE", "SUB", "SUP",
-                    "TABLE", "TD", "TR", "THEAD", "TH", "TBODY", "TFOOT", "TEXTAREA",
-                    "TITLE", "TT", "UL", "U", "VAR"];
+var _tagNamesArr = [
+    "A",
+    "ABBR",
+    "ACRONYM",
+    "ADDRESS",
+    "APPLET",
+    "AREA",
+    "B",
+    "BASEFONT",
+    "BDO",
+    "BGSOUND",
+    "BIG",
+    "BLOCKQUOTE",
+    "BLINK",
+    "BODY",
+    "BR",
+    "BUTTON",
+    "CAPTION",
+    "CENTER",
+    "CITE",
+    "CODE",
+    "COL",
+    "COLGROUP",
+    "DD",
+    "DFN",
+    "DEL",
+    "DIR",
+    "DIV",
+    "DL",
+    "DT",
+    "EMBED",
+    "EM",
+    "FIELDSET",
+    "FONT",
+    "FORM",
+    "FRAME",
+    "FRAMESET",
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "H5",
+    "H6",
+    "HEAD",
+    "HR",
+    "HTML",
+    "IMG",
+    "IFRAME",
+    "INPUT",
+    "INS",
+    "ISINDEX",
+    "I",
+    "KBD",
+    "LABEL",
+    "LEGEND",
+    "LI",
+    "LINK",
+    "MARQUEE",
+    "MENU",
+    "META",
+    "NOFRAME",
+    "NOSCRIPT",
+    "OPTGROUP",
+    "OPTION",
+    "OL",
+    "P",
+    "Q",
+    "PRE",
+    "S",
+    "SAMP",
+    "SCRIPT",
+    "SELECT",
+    "SMALL",
+    "SPAN",
+    "STRIKE",
+    "STRONG",
+    "STYLE",
+    "SUB",
+    "SUP",
+    "TABLE",
+    "TD",
+    "TR",
+    "THEAD",
+    "TH",
+    "TBODY",
+    "TFOOT",
+    "TEXTAREA",
+    "TITLE",
+    "TT",
+    "UL",
+    "U",
+    "VAR"
+];
 
 module.exports = _tagNamesArr;
 
 },{}],6:[function(require,module,exports){
-var _validRoleArr = ["alert", "alertdialog", "application", "article", "banner", "button", "checkbox", "columnheader", "combobox",
-    "command", "complementary", "composite", "contentinfo", "definition", "dialog", "directory", "document", "form",
-    "grid", "gridcell", "group", "heading", "img", "input", "landmark", "link", "list", "listbox", "listitem",
-    "log", "main", "marquee", "math", "menu", "menubar", "menuitem", "menuitemcheckbox", "menuitemradio", "navigation",
-    "note", "option", "presentation", "progressbar", "radio", "radiogroup", "range", "region", "roletype", "row", "rowgroup",
-    "rowheader", "search", "section", "sectionhead", "select", "separator", "scrollbar", "slider", "spinbutton", "status",
-    "structure", "tab", "tablist", "tabpanel", "textbox", "timer", "toolbar", "tooltip", "tree", "treegrid", "treeitem",
-    "widget", "window"
+var _validRoleArr = [
+    "alert",
+    "alertdialog",
+    "application",
+    "article",
+    "banner",
+    "button",
+    "checkbox",
+    "columnheader",
+    "combobox",
+    "command",
+    "complementary",
+    "composite",
+    "contentinfo",
+    "definition",
+    "dialog",
+    "directory",
+    "document",
+    "form",
+    "grid",
+    "gridcell",
+    "group",
+    "heading",
+    "img",
+    "input",
+    "landmark",
+    "link",
+    "list",
+    "listbox",
+    "listitem",
+    "log",
+    "main",
+    "marquee",
+    "math",
+    "menu",
+    "menubar",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "navigation",
+    "note",
+    "option",
+    "presentation",
+    "progressbar",
+    "radio",
+    "radiogroup",
+    "range",
+    "region",
+    "roletype",
+    "row",
+    "rowgroup",
+    "rowheader",
+    "search",
+    "section",
+    "sectionhead",
+    "select",
+    "separator",
+    "scrollbar",
+    "slider",
+    "spinbutton",
+    "status",
+    "structure",
+    "tab",
+    "tablist",
+    "tabpanel",
+    "textbox",
+    "timer",
+    "toolbar",
+    "tooltip",
+    "tree",
+    "treegrid",
+    "treeitem",
+    "widget",
+    "window"
 ];
 
 module.exports = _validRoleArr;
@@ -847,7 +1050,10 @@ _enums.ariaRolesEnum = enumCreator({
     alertdialog: {
         namefrom: ["author"],
         namerequired: !0,
-        parent: ["alert", "dialog"]
+        parent: [
+            "alert",
+            "dialog"
+        ]
     },
     application: {
         namefrom: ["author"],
@@ -856,7 +1062,10 @@ _enums.ariaRolesEnum = enumCreator({
     },
     article: {
         namefrom: ["author"],
-        parent: ["document", "region"]
+        parent: [
+            "document",
+            "region"
+        ]
     },
     banner: {
         namefrom: ["author"],
@@ -864,13 +1073,20 @@ _enums.ariaRolesEnum = enumCreator({
     },
     button: {
         childpresentational: !0,
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
         parent: ["command"],
-        properties: ["aria-expanded", "aria-pressed"]
+        properties: [
+            "aria-expanded",
+            "aria-pressed"
+        ]
     },
     checkbox: {
-        namefrom: ["contents",
+        namefrom: [
+            "contents",
             "author"
         ],
         namerequired: !0,
@@ -879,19 +1095,33 @@ _enums.ariaRolesEnum = enumCreator({
         properties: ["aria-checked"]
     },
     columnheader: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
-        parent: ["gridcell", "sectionhead", "widget"],
+        parent: [
+            "gridcell",
+            "sectionhead",
+            "widget"
+        ],
         properties: ["aria-sort"],
         scope: ["row"]
     },
     combobox: {
-        mustcontain: ["listbox", "textbox"],
+        mustcontain: [
+            "listbox",
+            "textbox"
+        ],
         namefrom: ["author"],
         namerequired: !0,
         parent: ["select"],
         requiredProperties: ["aria-expanded"],
-        properties: ["aria-expanded", "aria-autocomplete", "aria-required"]
+        properties: [
+            "aria-expanded",
+            "aria-autocomplete",
+            "aria-required"
+        ]
     },
     command: {
         "abstract": !0,
@@ -923,7 +1153,10 @@ _enums.ariaRolesEnum = enumCreator({
         parent: ["window"]
     },
     directory: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         parent: ["list"]
     },
     document: {
@@ -937,17 +1170,37 @@ _enums.ariaRolesEnum = enumCreator({
         parent: ["landmark"]
     },
     grid: {
-        mustcontain: ["row", "rowgroup"],
+        mustcontain: [
+            "row",
+            "rowgroup"
+        ],
         namefrom: ["author"],
         namerequired: !0,
-        parent: ["composite", "region"],
-        properties: ["aria-level", "aria-multiselectable", "aria-readonly"]
+        parent: [
+            "composite",
+            "region"
+        ],
+        properties: [
+            "aria-level",
+            "aria-multiselectable",
+            "aria-readonly"
+        ]
     },
     gridcell: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
-        parent: ["section", "widget"],
-        properties: ["aria-readonly", "aria-required", "aria-selected"],
+        parent: [
+            "section",
+            "widget"
+        ],
+        properties: [
+            "aria-readonly",
+            "aria-required",
+            "aria-selected"
+        ],
         scope: ["row"]
     },
     group: {
@@ -973,18 +1226,27 @@ _enums.ariaRolesEnum = enumCreator({
     },
     landmark: {
         "abstract": !0,
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !1,
         parent: ["region"]
     },
     link: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
         parent: ["command"],
         properties: ["aria-expanded"]
     },
     list: {
-        mustcontain: ["group", "listitem"],
+        mustcontain: [
+            "group",
+            "listitem"
+        ],
         namefrom: ["author"],
         parent: ["region"]
     },
@@ -992,14 +1254,27 @@ _enums.ariaRolesEnum = enumCreator({
         mustcontain: ["option"],
         namefrom: ["author"],
         namerequired: !0,
-        parent: ["list", "select"],
-        properties: ["aria-multiselectable", "aria-required"]
+        parent: [
+            "list",
+            "select"
+        ],
+        properties: [
+            "aria-multiselectable",
+            "aria-required"
+        ]
     },
     listitem: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
         parent: ["section"],
-        properties: ["aria-level", "aria-posinset", "aria-setsize"],
+        properties: [
+            "aria-level",
+            "aria-posinset",
+            "aria-setsize"
+        ],
         scope: ["list"]
     },
     log: {
@@ -1021,32 +1296,64 @@ _enums.ariaRolesEnum = enumCreator({
         parent: ["section"]
     },
     menu: {
-        mustcontain: ["group", "menuitemradio", "menuitem", "menuitemcheckbox"],
+        mustcontain: [
+            "group",
+            "menuitemradio",
+            "menuitem",
+            "menuitemcheckbox"
+        ],
         namefrom: ["author"],
         namerequired: !0,
-        parent: ["list", "select"]
+        parent: [
+            "list",
+            "select"
+        ]
     },
     menubar: {
         namefrom: ["author"],
         parent: ["menu"]
     },
     menuitem: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
         parent: ["command"],
-        scope: ["menu", "menubar"]
+        scope: [
+            "menu",
+            "menubar"
+        ]
     },
     menuitemcheckbox: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
-        parent: ["checkbox", "menuitem"],
-        scope: ["menu", "menubar"]
+        parent: [
+            "checkbox",
+            "menuitem"
+        ],
+        scope: [
+            "menu",
+            "menubar"
+        ]
     },
     menuitemradio: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
-        parent: ["menuitemcheckbox", "radio"],
-        scope: ["menu", "menubar"]
+        parent: [
+            "menuitemcheckbox",
+            "radio"
+        ],
+        scope: [
+            "menu",
+            "menubar"
+        ]
     },
     navigation: {
         namefrom: ["author"],
@@ -1057,10 +1364,18 @@ _enums.ariaRolesEnum = enumCreator({
         parent: ["section"]
     },
     option: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
         parent: ["input"],
-        properties: ["aria-checked", "aria-posinset", "aria-selected", "aria-setsize"]
+        properties: [
+            "aria-checked",
+            "aria-posinset",
+            "aria-selected",
+            "aria-setsize"
+        ]
     },
     presentation: {
         parent: ["structure"]
@@ -1072,9 +1387,15 @@ _enums.ariaRolesEnum = enumCreator({
         parent: ["range"]
     },
     radio: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
-        parent: ["checkbox", "option"]
+        parent: [
+            "checkbox",
+            "option"
+        ]
     },
     radiogroup: {
         mustcontain: ["radio"],
@@ -1087,7 +1408,12 @@ _enums.ariaRolesEnum = enumCreator({
         "abstract": !0,
         namefrom: ["author"],
         parent: ["widget"],
-        properties: ["aria-valuemax", "aria-valuemin", "aria-valuenow", "aria-valuetext"]
+        properties: [
+            "aria-valuemax",
+            "aria-valuemin",
+            "aria-valuenow",
+            "aria-valuetext"
+        ]
     },
     region: {
         namefrom: [" author"],
@@ -1095,25 +1421,53 @@ _enums.ariaRolesEnum = enumCreator({
     },
     roletype: {
         "abstract": !0,
-        properties: "aria-atomic aria-busy aria-controls aria-describedby aria-disabled aria-dropeffect aria-flowto aria-grabbed aria-haspopup aria-hidden aria-invalid aria-label aria-labelledby aria-live aria-owns aria-relevant".split(" ")
+        properties: "aria-atomic aria-busy aria-controls aria-describedby aria-disabled aria-dropeffect aria-flowto aria-grabbed aria-haspopup aria-hidden aria-invalid aria-label aria-labelledby aria-live aria-owns aria-relevant".split(
+            " ")
     },
     row: {
-        mustcontain: ["columnheader", "gridcell", "rowheader"],
-        namefrom: ["contents", "author"],
-        parent: ["group", "widget"],
-        properties: ["aria-level", "aria-selected"],
-        scope: ["grid", "rowgroup", "treegrid"]
+        mustcontain: [
+            "columnheader",
+            "gridcell",
+            "rowheader"
+        ],
+        namefrom: [
+            "contents",
+            "author"
+        ],
+        parent: [
+            "group",
+            "widget"
+        ],
+        properties: [
+            "aria-level",
+            "aria-selected"
+        ],
+        scope: [
+            "grid",
+            "rowgroup",
+            "treegrid"
+        ]
     },
     rowgroup: {
         mustcontain: ["row"],
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         parent: ["group"],
         scope: ["grid"]
     },
     rowheader: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
-        parent: ["gridcell", "sectionhead", "widget"],
+        parent: [
+            "gridcell",
+            "sectionhead",
+            "widget"
+        ],
         properties: ["aria-sort"],
         scope: ["row"]
     },
@@ -1123,49 +1477,101 @@ _enums.ariaRolesEnum = enumCreator({
     },
     section: {
         "abstract": !0,
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         parent: ["structure"],
         properties: ["aria-expanded"]
     },
     sectionhead: {
         "abstract": !0,
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         parent: ["structure"],
         properties: ["aria-expanded"]
     },
     select: {
         "abstract": !0,
         namefrom: ["author"],
-        parent: ["composite", "group", "input"]
+        parent: [
+            "composite",
+            "group",
+            "input"
+        ]
     },
     separator: {
         childpresentational: !0,
         namefrom: ["author"],
         parent: ["structure"],
-        properties: ["aria-expanded", "aria-orientation"]
+        properties: [
+            "aria-expanded",
+            "aria-orientation"
+        ]
     },
     scrollbar: {
         childpresentational: !0,
         namefrom: ["author"],
         namerequired: !1,
-        parent: ["input", "range"],
-        requiredProperties: ["aria-controls", "aria-orientation", "aria-valuemax", "aria-valuemin", "aria-valuenow"],
-        properties: ["aria-controls", "aria-orientation", "aria-valuemax", "aria-valuemin", "aria-valuenow"]
+        parent: [
+            "input",
+            "range"
+        ],
+        requiredProperties: [
+            "aria-controls",
+            "aria-orientation",
+            "aria-valuemax",
+            "aria-valuemin",
+            "aria-valuenow"
+        ],
+        properties: [
+            "aria-controls",
+            "aria-orientation",
+            "aria-valuemax",
+            "aria-valuemin",
+            "aria-valuenow"
+        ]
     },
     slider: {
         childpresentational: !0,
         namefrom: ["author"],
         namerequired: !0,
-        parent: ["input", "range"],
-        requiredProperties: ["aria-valuemax", "aria-valuemin", "aria-valuenow"],
-        properties: ["aria-valuemax", "aria-valuemin", "aria-valuenow", "aria-orientation"]
+        parent: [
+            "input",
+            "range"
+        ],
+        requiredProperties: [
+            "aria-valuemax",
+            "aria-valuemin",
+            "aria-valuenow"
+        ],
+        properties: [
+            "aria-valuemax",
+            "aria-valuemin",
+            "aria-valuenow",
+            "aria-orientation"
+        ]
     },
     spinbutton: {
         namefrom: ["author"],
         namerequired: !0,
-        parent: ["input", "range"],
-        requiredProperties: ["aria-valuemax", "aria-valuemin", "aria-valuenow"],
-        properties: ["aria-valuemax", "aria-valuemin", "aria-valuenow", "aria-required"]
+        parent: [
+            "input",
+            "range"
+        ],
+        requiredProperties: [
+            "aria-valuemax",
+            "aria-valuemin",
+            "aria-valuenow"
+        ],
+        properties: [
+            "aria-valuemax",
+            "aria-valuemin",
+            "aria-valuenow",
+            "aria-required"
+        ]
     },
     status: {
         parent: ["region"]
@@ -1175,15 +1581,24 @@ _enums.ariaRolesEnum = enumCreator({
         parent: ["roletype"]
     },
     tab: {
-        namefrom: ["contents", "author"],
-        parent: ["sectionhead", "widget"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
+        parent: [
+            "sectionhead",
+            "widget"
+        ],
         properties: ["aria-selected"],
         scope: ["tablist"]
     },
     tablist: {
         mustcontain: ["tab"],
         namefrom: ["author"],
-        parent: ["composite", "directory"],
+        parent: [
+            "composite",
+            "directory"
+        ],
         properties: ["aria-level"]
     },
     tabpanel: {
@@ -1195,7 +1610,13 @@ _enums.ariaRolesEnum = enumCreator({
         namefrom: ["author"],
         namerequired: !0,
         parent: ["input"],
-        properties: ["aria-activedescendant", "aria-autocomplete", "aria-multiline", "aria-readonly", "aria-required"]
+        properties: [
+            "aria-activedescendant",
+            "aria-autocomplete",
+            "aria-multiline",
+            "aria-readonly",
+            "aria-required"
+        ]
     },
     timer: {
         namefrom: ["author"],
@@ -1211,23 +1632,41 @@ _enums.ariaRolesEnum = enumCreator({
         parent: ["section"]
     },
     tree: {
-        mustcontain: ["group", "treeitem"],
+        mustcontain: [
+            "group",
+            "treeitem"
+        ],
         namefrom: ["author"],
         namerequired: !0,
         parent: ["select"],
-        properties: ["aria-multiselectable", "aria-required"]
+        properties: [
+            "aria-multiselectable",
+            "aria-required"
+        ]
     },
     treegrid: {
         mustcontain: ["row"],
         namefrom: ["author"],
         namerequired: !0,
-        parent: ["grid", "tree"]
+        parent: [
+            "grid",
+            "tree"
+        ]
     },
     treeitem: {
-        namefrom: ["contents", "author"],
+        namefrom: [
+            "contents",
+            "author"
+        ],
         namerequired: !0,
-        parent: ["listitem", "option"],
-        scope: ["group", "tree"]
+        parent: [
+            "listitem",
+            "option"
+        ],
+        scope: [
+            "group",
+            "tree"
+        ]
     },
     widget: {
         "abstract": !0,
@@ -1255,7 +1694,12 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "none",
         type: "property",
         valueType: "token",
-        values: ["inline", "list", "both", "none"]
+        values: [
+            "inline",
+            "list",
+            "both",
+            "none"
+        ]
     },
     busy: {
         defaultValue: "false",
@@ -1266,7 +1710,12 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "undefined",
         type: "state",
         valueType: "token",
-        values: ["true", "false", "mixed", "undefined"]
+        values: [
+            "true",
+            "false",
+            "mixed",
+            "undefined"
+        ]
     },
     controls: {
         type: "property",
@@ -1291,7 +1740,11 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "undefined",
         type: "state",
         valueType: "token",
-        values: ["true", "false", "undefined"]
+        values: [
+            "true",
+            "false",
+            "undefined"
+        ]
     },
     flowto: {
         type: "property",
@@ -1301,7 +1754,9 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "undefined",
         type: "state",
         valueType: "token",
-        values: ["true", "false",
+        values: [
+            "true",
+            "false",
             "undefined"
         ]
     },
@@ -1319,7 +1774,12 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "false",
         type: "state",
         valueType: "token",
-        values: ["grammar", "false", "spelling", "true"]
+        values: [
+            "grammar",
+            "false",
+            "spelling",
+            "true"
+        ]
     },
     label: {
         type: "property",
@@ -1337,7 +1797,11 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "off",
         type: "property",
         valueType: "token",
-        values: ["off", "polite", "assertive"]
+        values: [
+            "off",
+            "polite",
+            "assertive"
+        ]
     },
     multiline: {
         defaultValue: "false",
@@ -1353,7 +1817,10 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "vertical",
         type: "property",
         valueType: "token",
-        values: ["horizontal", "vertical"]
+        values: [
+            "horizontal",
+            "vertical"
+        ]
     },
     owns: {
         type: "property",
@@ -1367,7 +1834,12 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "undefined",
         type: "state",
         valueType: "token",
-        values: ["true", "false", "mixed", "undefined"]
+        values: [
+            "true",
+            "false",
+            "mixed",
+            "undefined"
+        ]
     },
     readonly: {
         defaultValue: "false",
@@ -1378,7 +1850,12 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "additions text",
         type: "property",
         valueType: "token_list",
-        values: ["additions", "removals", "text", "all"]
+        values: [
+            "additions",
+            "removals",
+            "text",
+            "all"
+        ]
     },
     required: {
         defaultValue: "false",
@@ -1389,7 +1866,11 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "undefined",
         type: "state",
         valueType: "token",
-        values: ["true", "false", "undefined"]
+        values: [
+            "true",
+            "false",
+            "undefined"
+        ]
     },
     setsize: {
         type: "property",
@@ -1399,7 +1880,10 @@ _enums.ariaPropertiesEnum = enumCreator({
         defaultValue: "none",
         type: "property",
         valueType: "token",
-        values: ["ascending", "descending", "none",
+        values: [
+            "ascending",
+            "descending",
+            "none",
             "other"
         ]
     },
@@ -1456,469 +1940,753 @@ _enums.InlineElementsEnum = enumCreator({
 });
 
 _enums.TagAndSemanticInfoEnum = enumCreator({
-    A: [{
-        role: "link",
-        allowed: "button checkbox menuitem menuitemcheckbox menuitemradio tab treeitem".split(" "),
-        selector: "a[href]"
-    }],
-    ADDRESS: [{
-        role: "",
-        allowed: ["contentinfo", "presentation"]
-    }],
-    AREA: [{
-        role: "link",
-        selector: "area[href]"
-    }],
-    ARTICLE: [{
-        role: "article",
-        allowed: ["presentation", "article", "document", "application", "main"]
-    }],
-    ASIDE: [{
-        role: "complementary",
-        allowed: ["note", "complementary", "search", "presentation"]
-    }],
-    AUDIO: [{
-        role: "",
-        allowed: ["application",
-            "presentation"
-        ]
-    }],
-    BASE: [{
-        role: "",
-        reserved: !0
-    }],
-    BODY: [{
-        role: "document",
-        allowed: ["presentation"]
-    }],
-    BUTTON: [{
-        role: "button",
-        allowed: ["link", "menuitem", "menuitemcheckbox", "menuitemradio", "radio"],
-        selector: 'button:not([aria-pressed]):not([type="menu"])'
-    }, {
-        role: "button",
-        allowed: ["button"],
-        selector: "button[aria-pressed]"
-    }, {
-        role: "button",
-        attributes: {
-            "aria-haspopup": !0
+    A: [
+        {
+            role: "link",
+            allowed: "button checkbox menuitem menuitemcheckbox menuitemradio tab treeitem".split(" "),
+            selector: "a[href]"
+        }
+    ],
+    ADDRESS: [
+        {
+            role: "",
+            allowed: [
+                "contentinfo",
+                "presentation"
+            ]
+        }
+    ],
+    AREA: [
+        {
+            role: "link",
+            selector: "area[href]"
+        }
+    ],
+    ARTICLE: [
+        {
+            role: "article",
+            allowed: [
+                "presentation",
+                "article",
+                "document",
+                "application",
+                "main"
+            ]
+        }
+    ],
+    ASIDE: [
+        {
+            role: "complementary",
+            allowed: [
+                "note",
+                "complementary",
+                "search",
+                "presentation"
+            ]
+        }
+    ],
+    AUDIO: [
+        {
+            role: "",
+            allowed: [
+                "application",
+                "presentation"
+            ]
+        }
+    ],
+    BASE: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    BODY: [
+        {
+            role: "document",
+            allowed: ["presentation"]
+        }
+    ],
+    BUTTON: [
+        {
+            role: "button",
+            allowed: [
+                "link",
+                "menuitem",
+                "menuitemcheckbox",
+                "menuitemradio",
+                "radio"
+            ],
+            selector: 'button:not([aria-pressed]):not([type="menu"])'
         },
-        allowed: ["link", "menuitem", "menuitemcheckbox", "menuitemradio", "radio"],
-        selector: 'button[type="menu"]'
-    }],
-    CAPTION: [{
-        role: "",
-        allowed: ["presentation"]
-    }],
-    COL: [{
-        role: "",
-        reserved: !0
-    }],
-    COLGROUP: [{
-        role: "",
-        reserved: !0
-    }],
-    DATALIST: [{
-        role: "listbox",
-        attributes: {
-            "aria-multiselectable": !1
+        {
+            role: "button",
+            allowed: ["button"],
+            selector: "button[aria-pressed]"
         },
-        allowed: ["presentation"]
-    }],
-    DEL: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    DD: [{
-        role: "",
-        allowed: ["presentation"]
-    }],
-    DT: [{
-        role: "",
-        allowed: ["presentation"]
-    }],
-    DETAILS: [{
-        role: "group",
-        allowed: ["group", "presentation"]
-    }],
-    DIALOG: [{
-        role: "dialog",
-        allowed: "dialog alert alertdialog application log marquee status".split(" "),
-        selector: "dialog[open]"
-    }, {
-        role: "dialog",
-        attributes: {
-            "aria-hidden": !0
+        {
+            role: "button",
+            attributes: {
+                "aria-haspopup": !0
+            },
+            allowed: [
+                "link",
+                "menuitem",
+                "menuitemcheckbox",
+                "menuitemradio",
+                "radio"
+            ],
+            selector: 'button[type="menu"]'
+        }
+    ],
+    CAPTION: [
+        {
+            role: "",
+            allowed: ["presentation"]
+        }
+    ],
+    COL: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    COLGROUP: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    DATALIST: [
+        {
+            role: "listbox",
+            attributes: {
+                "aria-multiselectable": !1
+            },
+            allowed: ["presentation"]
+        }
+    ],
+    DEL: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    DD: [
+        {
+            role: "",
+            allowed: ["presentation"]
+        }
+    ],
+    DT: [
+        {
+            role: "",
+            allowed: ["presentation"]
+        }
+    ],
+    DETAILS: [
+        {
+            role: "group",
+            allowed: [
+                "group",
+                "presentation"
+            ]
+        }
+    ],
+    DIALOG: [
+        {
+            role: "dialog",
+            allowed: "dialog alert alertdialog application log marquee status".split(" "),
+            selector: "dialog[open]"
         },
-        allowed: "dialog alert alertdialog application log marquee status".split(" "),
-        selector: "dialog:not([open])"
-    }],
-    DIV: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    DL: [{
-        role: "list",
-        allowed: ["presentation"]
-    }],
-    EMBED: [{
-        role: "",
-        allowed: ["application", "document", "img", "presentation"]
-    }],
-    FIGURE: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    FOOTER: [{
-        role: "",
-        allowed: ["contentinfo", "presentation"]
-    }],
-    FORM: [{
-        role: "form",
-        allowed: ["presentation"]
-    }],
-    P: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    PRE: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    BLOCKQUOTE: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    H1: [{
-        role: "heading"
-    }],
-    H2: [{
-        role: "heading"
-    }],
-    H3: [{
-        role: "heading"
-    }],
-    H4: [{
-        role: "heading"
-    }],
-    H5: [{
-        role: "heading"
-    }],
-    H6: [{
-        role: "heading"
-    }],
-    HEAD: [{
-        role: "",
-        reserved: !0
-    }],
-    HEADER: [{
-        role: "",
-        allowed: ["banner", "presentation"]
-    }],
-    HR: [{
-        role: "separator",
-        allowed: ["presentation"]
-    }],
-    HTML: [{
-        role: "",
-        reserved: !0
-    }],
-    IFRAME: [{
-        role: "",
-        allowed: ["application", "document", "img", "presentation"],
-        selector: "iframe:not([seamless])"
-    }, {
-        role: "",
-        allowed: ["application", "document",
-            "img", "presentation", "group"
-        ],
-        selector: "iframe[seamless]"
-    }],
-    IMG: [{
-        role: "presentation",
-        reserved: !0,
-        selector: 'img[alt=""]'
-    }, {
-        role: "img",
-        allowed: ["*"],
-        selector: 'img[alt]:not([alt=""])'
-    }],
-    INPUT: [{
-        role: "button",
-        allowed: ["link", "menuitem", "menuitemcheckbox", "menuitemradio", "radio"],
-        selector: 'input[type="button"]:not([aria-pressed])'
-    }, {
-        role: "button",
-        allowed: ["button"],
-        selector: 'input[type="button"][aria-pressed]'
-    }, {
-        role: "checkbox",
-        allowed: ["checkbox"],
-        selector: 'input[type="checkbox"]'
-    }, {
-        role: "",
-        selector: 'input[type="color"]'
-    }, {
-        role: "",
-        selector: 'input[type="date"]'
-    }, {
-        role: "",
-        selector: 'input[type="datetime"]'
-    }, {
-        role: "textbox",
-        selector: 'input[type="email"]:not([list])'
-    }, {
-        role: "",
-        selector: 'input[type="file"]'
-    }, {
-        role: "",
-        reserved: !0,
-        selector: 'input[type="hidden"]'
-    }, {
-        role: "button",
-        allowed: ["button"],
-        selector: 'input[type="image"][aria-pressed]'
-    }, {
-        role: "button",
-        allowed: ["link", "menuitem", "menuitemcheckbox", "menuitemradio", "radio"],
-        selector: 'input[type="image"]:not([aria-pressed])'
-    }, {
-        role: "",
-        selector: 'input[type="month"]'
-    }, {
-        role: "",
-        selector: 'input[type="number"]'
-    }, {
-        role: "textbox",
-        selector: 'input[type="password"]'
-    }, {
-        role: "radio",
-        allowed: ["menuitemradio"],
-        selector: 'input[type="radio"]'
-    }, {
-        role: "slider",
-        selector: 'input[type="range"]'
-    }, {
-        role: "button",
-        selector: 'input[type="reset"]'
-    }, {
-        role: "combobox",
-        selector: 'input[type="search"][list]'
-    }, {
-        role: "textbox",
-        selector: 'input[type="search"]:not([list])'
-    }, {
-        role: "button",
-        selector: 'input[type="submit"]'
-    }, {
-        role: "combobox",
-        selector: 'input[type="tel"][list]'
-    }, {
-        role: "textbox",
-        selector: 'input[type="tel"]:not([list])'
-    }, {
-        role: "combobox",
-        selector: 'input[type="text"][list]'
-    }, {
-        role: "textbox",
-        selector: 'input[type="text"]:not([list])'
-    }, {
-        role: "textbox",
-        selector: "input:not([type])"
-    }, {
-        role: "",
-        selector: 'input[type="time"]'
-    }, {
-        role: "combobox",
-        selector: 'input[type="url"][list]'
-    }, {
-        role: "textbox",
-        selector: 'input[type="url"]:not([list])'
-    }, {
-        role: "",
-        selector: 'input[type="week"]'
-    }],
-    INS: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    KEYGEN: [{
-        role: ""
-    }],
-    LABEL: [{
-        role: "",
-        allowed: ["presentation"]
-    }],
-    LI: [{
-        role: "listitem",
-        allowed: "menuitem menuitemcheckbox menuitemradio option tab treeitem presentation".split(" "),
-        selector: 'ol:not([role="presentation"])>li, ul:not([role="presentation"])>li'
-    }, {
-        role: "listitem",
-        allowed: "listitem menuitem menuitemcheckbox menuitemradio option tab treeitem presentation".split(" "),
-        selector: 'ol[role="presentation"]>li, ul[role="presentation"]>li'
-    }],
-    LINK: [{
-        role: "link",
-        reserved: !0,
-        selector: "link[href]"
-    }],
-    MAIN: [{
-        role: "",
-        allowed: ["main", "presentation"]
-    }],
-    MAP: [{
-        role: "",
-        reserved: !0
-    }],
-    MATH: [{
-        role: "",
-        allowed: ["presentation"]
-    }],
-    MENU: [{
-        role: "toolbar",
-        selector: 'menu[type="toolbar"]'
-    }],
-    MENUITEM: [{
-        role: "menuitem",
-        selector: 'menuitem[type="command"]'
-    }, {
-        role: "menuitemcheckbox",
-        selector: 'menuitem[type="checkbox"]'
-    }, {
-        role: "menuitemradio",
-        selector: 'menuitem[type="radio"]'
-    }],
-    META: [{
-        role: "",
-        reserved: !0
-    }],
-    METER: [{
-        role: "progressbar",
-        allowed: ["presentation"]
-    }],
-    NAV: [{
-        role: "navigation",
-        allowed: ["navigation", "presentation"]
-    }],
-    NOSCRIPT: [{
-        role: "",
-        reserved: !0
-    }],
-    OBJECT: [{
-        role: "",
-        allowed: ["application", "document", "img", "presentation"]
-    }],
-    OL: [{
-        role: "list",
-        allowed: "directory group listbox menu menubar tablist toolbar tree presentation".split(" ")
-    }],
-    OPTGROUP: [{
-        role: "",
-        allowed: ["presentation"]
-    }],
-    OPTION: [{
-        role: "option"
-    }],
-    OUTPUT: [{
-        role: "status",
-        allowed: ["*"]
-    }],
-    PARAM: [{
-        role: "",
-        reserved: !0
-    }],
-    PICTURE: [{
-        role: "",
-        reserved: !0
-    }],
-    PROGRESS: [{
-        role: "progressbar",
-        allowed: ["presentation"]
-    }],
-    SCRIPT: [{
-        role: "",
-        reserved: !0
-    }],
-    SECTION: [{
-        role: "region",
-        allowed: "alert alertdialog application contentinfo dialog document log marquee search status presentation".split(" ")
-    }],
-    SELECT: [{
-        role: "listbox"
-    }],
-    SOURCE: [{
-        role: "",
-        reserved: !0
-    }],
-    SPAN: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    STYLE: [{
-        role: "",
-        reserved: !0
-    }],
-    SVG: [{
-        role: "",
-        allowed: ["application", "document", "img", "presentation"]
-    }],
-    SUMMARY: [{
-        role: "",
-        allowed: ["presentation"]
-    }],
-    TABLE: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    TEMPLATE: [{
-        role: "",
-        reserved: !0
-    }],
-    TEXTAREA: [{
-        role: "textbox"
-    }],
-    TBODY: [{
-        role: "rowgroup",
-        allowed: ["*"]
-    }],
-    THEAD: [{
-        role: "rowgroup",
-        allowed: ["*"]
-    }],
-    TFOOT: [{
-        role: "rowgroup",
-        allowed: ["*"]
-    }],
-    TITLE: [{
-        role: "",
-        reserved: !0
-    }],
-    TD: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    TH: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    TR: [{
-        role: "",
-        allowed: ["*"]
-    }],
-    TRACK: [{
-        role: "",
-        reserved: !0
-    }],
-    UL: [{
-        role: "list",
-        allowed: "directory group listbox menu menubar tablist toolbar tree presentation".split(" ")
-    }],
-    VIDEO: [{
-        role: "",
-        allowed: ["application", "presentation"]
-    }]
+        {
+            role: "dialog",
+            attributes: {
+                "aria-hidden": !0
+            },
+            allowed: "dialog alert alertdialog application log marquee status".split(" "),
+            selector: "dialog:not([open])"
+        }
+    ],
+    DIV: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    DL: [
+        {
+            role: "list",
+            allowed: ["presentation"]
+        }
+    ],
+    EMBED: [
+        {
+            role: "",
+            allowed: [
+                "application",
+                "document",
+                "img",
+                "presentation"
+            ]
+        }
+    ],
+    FIGURE: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    FOOTER: [
+        {
+            role: "",
+            allowed: [
+                "contentinfo",
+                "presentation"
+            ]
+        }
+    ],
+    FORM: [
+        {
+            role: "form",
+            allowed: ["presentation"]
+        }
+    ],
+    P: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    PRE: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    BLOCKQUOTE: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    H1: [
+        {
+            role: "heading"
+        }
+    ],
+    H2: [
+        {
+            role: "heading"
+        }
+    ],
+    H3: [
+        {
+            role: "heading"
+        }
+    ],
+    H4: [
+        {
+            role: "heading"
+        }
+    ],
+    H5: [
+        {
+            role: "heading"
+        }
+    ],
+    H6: [
+        {
+            role: "heading"
+        }
+    ],
+    HEAD: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    HEADER: [
+        {
+            role: "",
+            allowed: [
+                "banner",
+                "presentation"
+            ]
+        }
+    ],
+    HR: [
+        {
+            role: "separator",
+            allowed: ["presentation"]
+        }
+    ],
+    HTML: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    IFRAME: [
+        {
+            role: "",
+            allowed: [
+                "application",
+                "document",
+                "img",
+                "presentation"
+            ],
+            selector: "iframe:not([seamless])"
+        },
+        {
+            role: "",
+            allowed: [
+                "application",
+                "document",
+                "img",
+                "presentation",
+                "group"
+            ],
+            selector: "iframe[seamless]"
+        }
+    ],
+    IMG: [
+        {
+            role: "presentation",
+            reserved: !0,
+            selector: 'img[alt=""]'
+        },
+        {
+            role: "img",
+            allowed: ["*"],
+            selector: 'img[alt]:not([alt=""])'
+        }
+    ],
+    INPUT: [
+        {
+            role: "button",
+            allowed: [
+                "link",
+                "menuitem",
+                "menuitemcheckbox",
+                "menuitemradio",
+                "radio"
+            ],
+            selector: 'input[type="button"]:not([aria-pressed])'
+        },
+        {
+            role: "button",
+            allowed: ["button"],
+            selector: 'input[type="button"][aria-pressed]'
+        },
+        {
+            role: "checkbox",
+            allowed: ["checkbox"],
+            selector: 'input[type="checkbox"]'
+        },
+        {
+            role: "",
+            selector: 'input[type="color"]'
+        },
+        {
+            role: "",
+            selector: 'input[type="date"]'
+        },
+        {
+            role: "",
+            selector: 'input[type="datetime"]'
+        },
+        {
+            role: "textbox",
+            selector: 'input[type="email"]:not([list])'
+        },
+        {
+            role: "",
+            selector: 'input[type="file"]'
+        },
+        {
+            role: "",
+            reserved: !0,
+            selector: 'input[type="hidden"]'
+        },
+        {
+            role: "button",
+            allowed: ["button"],
+            selector: 'input[type="image"][aria-pressed]'
+        },
+        {
+            role: "button",
+            allowed: [
+                "link",
+                "menuitem",
+                "menuitemcheckbox",
+                "menuitemradio",
+                "radio"
+            ],
+            selector: 'input[type="image"]:not([aria-pressed])'
+        },
+        {
+            role: "",
+            selector: 'input[type="month"]'
+        },
+        {
+            role: "",
+            selector: 'input[type="number"]'
+        },
+        {
+            role: "textbox",
+            selector: 'input[type="password"]'
+        },
+        {
+            role: "radio",
+            allowed: ["menuitemradio"],
+            selector: 'input[type="radio"]'
+        },
+        {
+            role: "slider",
+            selector: 'input[type="range"]'
+        },
+        {
+            role: "button",
+            selector: 'input[type="reset"]'
+        },
+        {
+            role: "combobox",
+            selector: 'input[type="search"][list]'
+        },
+        {
+            role: "textbox",
+            selector: 'input[type="search"]:not([list])'
+        },
+        {
+            role: "button",
+            selector: 'input[type="submit"]'
+        },
+        {
+            role: "combobox",
+            selector: 'input[type="tel"][list]'
+        },
+        {
+            role: "textbox",
+            selector: 'input[type="tel"]:not([list])'
+        },
+        {
+            role: "combobox",
+            selector: 'input[type="text"][list]'
+        },
+        {
+            role: "textbox",
+            selector: 'input[type="text"]:not([list])'
+        },
+        {
+            role: "textbox",
+            selector: "input:not([type])"
+        },
+        {
+            role: "",
+            selector: 'input[type="time"]'
+        },
+        {
+            role: "combobox",
+            selector: 'input[type="url"][list]'
+        },
+        {
+            role: "textbox",
+            selector: 'input[type="url"]:not([list])'
+        },
+        {
+            role: "",
+            selector: 'input[type="week"]'
+        }
+    ],
+    INS: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    KEYGEN: [
+        {
+            role: ""
+        }
+    ],
+    LABEL: [
+        {
+            role: "",
+            allowed: ["presentation"]
+        }
+    ],
+    LI: [
+        {
+            role: "listitem",
+            allowed: "menuitem menuitemcheckbox menuitemradio option tab treeitem presentation".split(" "),
+            selector: 'ol:not([role="presentation"])>li, ul:not([role="presentation"])>li'
+        },
+        {
+            role: "listitem",
+            allowed: "listitem menuitem menuitemcheckbox menuitemradio option tab treeitem presentation".split(" "),
+            selector: 'ol[role="presentation"]>li, ul[role="presentation"]>li'
+        }
+    ],
+    LINK: [
+        {
+            role: "link",
+            reserved: !0,
+            selector: "link[href]"
+        }
+    ],
+    MAIN: [
+        {
+            role: "",
+            allowed: [
+                "main",
+                "presentation"
+            ]
+        }
+    ],
+    MAP: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    MATH: [
+        {
+            role: "",
+            allowed: ["presentation"]
+        }
+    ],
+    MENU: [
+        {
+            role: "toolbar",
+            selector: 'menu[type="toolbar"]'
+        }
+    ],
+    MENUITEM: [
+        {
+            role: "menuitem",
+            selector: 'menuitem[type="command"]'
+        },
+        {
+            role: "menuitemcheckbox",
+            selector: 'menuitem[type="checkbox"]'
+        },
+        {
+            role: "menuitemradio",
+            selector: 'menuitem[type="radio"]'
+        }
+    ],
+    META: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    METER: [
+        {
+            role: "progressbar",
+            allowed: ["presentation"]
+        }
+    ],
+    NAV: [
+        {
+            role: "navigation",
+            allowed: [
+                "navigation",
+                "presentation"
+            ]
+        }
+    ],
+    NOSCRIPT: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    OBJECT: [
+        {
+            role: "",
+            allowed: [
+                "application",
+                "document",
+                "img",
+                "presentation"
+            ]
+        }
+    ],
+    OL: [
+        {
+            role: "list",
+            allowed: "directory group listbox menu menubar tablist toolbar tree presentation".split(" ")
+        }
+    ],
+    OPTGROUP: [
+        {
+            role: "",
+            allowed: ["presentation"]
+        }
+    ],
+    OPTION: [
+        {
+            role: "option"
+        }
+    ],
+    OUTPUT: [
+        {
+            role: "status",
+            allowed: ["*"]
+        }
+    ],
+    PARAM: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    PICTURE: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    PROGRESS: [
+        {
+            role: "progressbar",
+            allowed: ["presentation"]
+        }
+    ],
+    SCRIPT: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    SECTION: [
+        {
+            role: "region",
+            allowed: "alert alertdialog application contentinfo dialog document log marquee search status presentation".split(
+                " ")
+        }
+    ],
+    SELECT: [
+        {
+            role: "listbox"
+        }
+    ],
+    SOURCE: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    SPAN: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    STYLE: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    SVG: [
+        {
+            role: "",
+            allowed: [
+                "application",
+                "document",
+                "img",
+                "presentation"
+            ]
+        }
+    ],
+    SUMMARY: [
+        {
+            role: "",
+            allowed: ["presentation"]
+        }
+    ],
+    TABLE: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    TEMPLATE: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    TEXTAREA: [
+        {
+            role: "textbox"
+        }
+    ],
+    TBODY: [
+        {
+            role: "rowgroup",
+            allowed: ["*"]
+        }
+    ],
+    THEAD: [
+        {
+            role: "rowgroup",
+            allowed: ["*"]
+        }
+    ],
+    TFOOT: [
+        {
+            role: "rowgroup",
+            allowed: ["*"]
+        }
+    ],
+    TITLE: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    TD: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    TH: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    TR: [
+        {
+            role: "",
+            allowed: ["*"]
+        }
+    ],
+    TRACK: [
+        {
+            role: "",
+            reserved: !0
+        }
+    ],
+    UL: [
+        {
+            role: "list",
+            allowed: "directory group listbox menu menubar tablist toolbar tree presentation".split(" ")
+        }
+    ],
+    VIDEO: [
+        {
+            role: "",
+            allowed: [
+                "application",
+                "presentation"
+            ]
+        }
+    ]
 });
 
 module.exports = _enums;
@@ -2020,7 +2788,8 @@ function _ruleExector(elem) {
                 RESULT: true,
                 MSG: "Passed!"
             };
-        } else if (elem.hasAttribute("role") && (!_.isEmpty(elem.getAttribute("role"))) && elem.getAttribute("role") === "presentation") {
+        } else if (elem.hasAttribute("role") && (!_.isEmpty(elem.getAttribute("role"))) &&
+            elem.getAttribute("role") === "presentation") {
             return {
                 TYPE: _severityEnum.INFO,
                 RESULT: true,
@@ -2042,12 +2811,14 @@ function _ruleExector(elem) {
     }
 }
 
-
 module.exports = {
     name: "imageWithoutAltText",
     description: "Images should have an alt attribute, unless they have an ARIA role of presentation",
     ruleID: "AX_01",
-    tagName: ["IMG", "INPUT"],
+    tagName: [
+        "IMG",
+        "INPUT"
+    ],
     handler: _ruleExector
 }
 
@@ -2058,11 +2829,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
 
@@ -2094,7 +2864,15 @@ module.exports = {
     name: "avoidPositiveTabIndex",
     description: "Avoid positive values for Tab index",
     ruleID: "AX_02",
-    tagName: ["IMG", "A", "DIV", "SPAN", "INPUT", "SELECT", "BUTTON"],
+    tagName: [
+        "IMG",
+        "A",
+        "DIV",
+        "SPAN",
+        "INPUT",
+        "SELECT",
+        "BUTTON"
+    ],
     handler: _ruleExector
 }
 
@@ -2105,12 +2883,11 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
- var ariaAttributesArray = require("../constants/ariaAttributesArray");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
+var ariaAttributesArray = require("../constants/ariaAttributesArray");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2179,10 +2956,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2230,10 +3007,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2272,7 +3049,15 @@ module.exports = {
     name: "isIdInAria_OwnsUnique",
     description: "An element's ID must not be present in more that one aria-owns attribute at any time",
     ruleID: "AX_05",
-    tagName: ["IMG", "A", "DIV", "SPAN", "INPUT", "SELECT", "BUTTON"],
+    tagName: [
+        "IMG",
+        "A",
+        "DIV",
+        "SPAN",
+        "INPUT",
+        "SELECT",
+        "BUTTON"
+    ],
     handler: _ruleExector
 }
 
@@ -2283,11 +3068,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2337,11 +3121,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2386,11 +3169,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2428,10 +3210,10 @@ module.exports = {
  **/
 
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2468,11 +3250,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2520,10 +3301,10 @@ module.exports = {
  **/
 
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 var validRoleArr = require("../constants/validAriaRolesArr");
 
 function _ruleExector(elem) {
@@ -2602,15 +3383,16 @@ module.exports = {
 },{"../axs/axsUtils":3,"../constants/validAriaRolesArr":6,"../enums/enums":7,"jquery":49,"lodash":50}],21:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "The web page should have the content's human language indicated in the markup. Identify the primary natural language of the document"
+ * Rule : "The web page should have the content's human language indicated in the markup. Identify the primary natural
+ * language of the document"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2648,10 +3430,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2677,21 +3459,30 @@ module.exports = {
     name: "hasMoreThanOneRoleMain",
     description: "There should be only one main element for a web page document",
     ruleID: "AX_13",
-    tagName: ["DIV", "H1", "H2", "H3", "H4", "H5", "H6"],
+    tagName: [
+        "DIV",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6"
+    ],
     handler: _ruleExector
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],23:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Prsence of Title attribute for ABBR, ACRONYM and A. Specify the expansion of each abbreviation or acronym in a document where it first occurs"
+ * Rule : "Prsence of Title attribute for ABBR, ACRONYM and A. Specify the expansion of each abbreviation or acronym in
+ * a document where it first occurs"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2717,7 +3508,15 @@ module.exports = {
     name: "hasTitleAttribute",
     description: "Presence of Title attribute for ABBR, ACRONYM, IFRAME and A. Specify the expansion of each abbreviation or acronym in a document where it first occurs",
     ruleID: "AX_14",
-    tagName: ["ABBR", "A", "ACRONYM", "IFRAME", "OBJECT", "MAP", "APPLET"],
+    tagName: [
+        "ABBR",
+        "A",
+        "ACRONYM",
+        "IFRAME",
+        "OBJECT",
+        "MAP",
+        "APPLET"
+    ],
     handler: _ruleExector
 }
 
@@ -2728,10 +3527,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2780,11 +3579,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2800,7 +3598,18 @@ module.exports = {
     name: "isDeprecatedElement",
     description: "Avoid Deprecated features of W3C technologies",
     ruleID: "AX_16",
-    tagName: ["FONT", "BASEFONT", "APPLET", "CENTER", "DIR", "ISINDEX", "MENU", "S", "STRIKE", "U"],
+    tagName: [
+        "FONT",
+        "BASEFONT",
+        "APPLET",
+        "CENTER",
+        "DIR",
+        "ISINDEX",
+        "MENU",
+        "S",
+        "STRIKE",
+        "U"
+    ],
     handler: _ruleExector
 }
 
@@ -2811,11 +3620,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2846,14 +3654,15 @@ module.exports = {
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],27:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Until user agents handle empty controls correctly, include default placeholding characters in edit boxes and text areas"
+ * Rule : "Until user agents handle empty controls correctly, include default placeholding characters in edit boxes and
+ * text areas"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -2884,7 +3693,11 @@ module.exports = {
     name: "hasDefaultPlaceholderTexts",
     description: "Until user agents handle empty controls correctly, include default placeholding characters in edit boxes and text areas",
     ruleID: "AX_18",
-    tagName: ["INPUT", "SELECT", "TEXTAREA"],
+    tagName: [
+        "INPUT",
+        "SELECT",
+        "TEXTAREA"
+    ],
     handler: _ruleExector
 }
 
@@ -2895,10 +3708,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2936,21 +3749,30 @@ module.exports = {
     name: "hasLabels",
     description: "Associate labels explicitly with their controls",
     ruleID: "AX_19",
-    tagName: ["INPUT", "SELECT", "TEXTAREA", "DATALIST", "METER", "KEYGEN", "OUTPUT"],
+    tagName: [
+        "INPUT",
+        "SELECT",
+        "TEXTAREA",
+        "DATALIST",
+        "METER",
+        "KEYGEN",
+        "OUTPUT"
+    ],
     handler: _ruleExector
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],29:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Until user agents provide the ability to stop the refresh, do not create periodically auto-refreshing / auto re-direct pages"
+ * Rule : "Until user agents provide the ability to stop the refresh, do not create periodically auto-refreshing / auto
+ * re-direct pages"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -2983,14 +3805,15 @@ module.exports = {
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],30:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Until user agents allow users to turn off spawned windows, do not cause pop-ups or other windows to appear and do not change the current window without informing the user."
+ * Rule : "Until user agents allow users to turn off spawned windows, do not cause pop-ups or other windows to appear
+ * and do not change the current window without informing the user."
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3016,21 +3839,25 @@ module.exports = {
     name: "isOpeningInNewTabOrPopUp",
     description: "Until user agents allow users to turn off spawned windows, do not cause pop-ups or other windows to appear and do not change the current window without informing the user.",
     ruleID: "AX_21",
-    tagName: ["A", "IFRAME"],
+    tagName: [
+        "A",
+        "IFRAME"
+    ],
     handler: _ruleExector
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],31:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Ensure that pages are usable when scripts, applets, or other programmatic objects are turned off or not supported. If this is not possible, provide equivalent information on an alternative accessible page"
+ * Rule : "Ensure that pages are usable when scripts, applets, or other programmatic objects are turned off or not
+ * supported. If this is not possible, provide equivalent information on an alternative accessible page"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3063,15 +3890,15 @@ module.exports = {
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],32:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Provide keyboard shortcuts to important links (including those in client-side image maps), form controls, and groups of form controls"
+ * Rule : "Provide keyboard shortcuts to important links (including those in client-side image maps), form controls,
+ * and groups of form controls"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
-
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3095,21 +3922,31 @@ module.exports = {
     name: "hasAccessKeyEnabled",
     description: "Provide keyboard shortcuts to important links (including those in client-side image maps), form controls, and groups of form controls",
     ruleID: "AX_23",
-    tagName: ["A", "AREA", "BUTTON", "INPUT", "TEXTAREA", "LABEL", "LEGEND", "SELECT"],
+    tagName: [
+        "A",
+        "AREA",
+        "BUTTON",
+        "INPUT",
+        "TEXTAREA",
+        "LABEL",
+        "LEGEND",
+        "SELECT"
+    ],
     handler: _ruleExector
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],33:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Check if there is atleast one header section / element for the page content that defines its purpose & context"
+ * Rule : "Check if there is atleast one header section / element for the page content that defines its purpose &
+ * context"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3168,10 +4005,10 @@ module.exports = {
  * Rule : "role=main must be present on significant elements only"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3225,10 +4062,10 @@ module.exports = {
  * Rule : "Avoid using the style attribute and defining styles inline and move them to stylesheets instead"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3238,8 +4075,11 @@ function _ruleExector(elem) {
         _copyright = $("meta[name='copyright']"),
         _hasCharset = $("meta[charset]");
 
-
-    if (_author.length === 1 && !_checkIfIsEmpty(_author.attr("content")) && _description.length === 1 && !_checkIfIsEmpty(_description.attr("content")) && _keywords.length === 1 && !_checkIfIsEmpty(_keywords.attr("content")) && _copyright.length === 1 && !_checkIfIsEmpty(_copyright.attr("content")) && _hasCharset.length === 1 && !_checkIfIsEmpty(_hasCharset.attr("charset"))) {
+    if (_author.length === 1 && !_checkIfIsEmpty(_author.attr("content")) && _description.length === 1 &&
+        !_checkIfIsEmpty(_description.attr("content")) && _keywords.length === 1 &&
+        !_checkIfIsEmpty(_keywords.attr("content")) && _copyright.length === 1 &&
+        !_checkIfIsEmpty(_copyright.attr("content")) && _hasCharset.length === 1 &&
+        !_checkIfIsEmpty(_hasCharset.attr("charset"))) {
         return {
             TYPE: _severityEnum.INFO,
             RESULT: true,
@@ -3274,10 +4114,10 @@ module.exports = {
  * Rule : "Check if there is a link that helps skip irrelevant information and land the user at the main content"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3327,10 +4167,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3365,10 +4205,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3392,7 +4232,10 @@ module.exports = {
     name: "isBorIElementUsed",
     description: "Don't use the <B> and <I> tags. They are used to create a visual presentation effect",
     ruleID: "AX_29",
-    tagName: ["B", "I"],
+    tagName: [
+        "B",
+        "I"
+    ],
     handler: _ruleExector
 }
 
@@ -3403,10 +4246,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3437,13 +4280,15 @@ module.exports = {
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],40:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
- * Rule : "Ensure that equivalents for dynamic content are updated when the dynamic content changes. As the contents of a frame changes, so must change any description. This is not possible if an IMG is inserted directly into a frame. Thus, content developers should always make the source ('src') of a frame an HTML file"
+ * Rule : "Ensure that equivalents for dynamic content are updated when the dynamic content changes. As the contents of
+ * a frame changes, so must change any description. This is not possible if an IMG is inserted directly into a frame.
+ * Thus, content developers should always make the source ('src') of a frame an HTML file"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
 
@@ -3455,7 +4300,8 @@ function _ruleExector(elem) {
         _url.href = elem.getAttribute("src");
 
         ['pathname'].forEach(function(k) {
-            if (_url[k].indexOf("jpg") !== -1 || _url[k].indexOf("jpeg") !== -1 || _url[k].indexOf("gif") !== -1 || _url[k].indexOf("png") !== -1) {
+            if (_url[k].indexOf("jpg") !== -1 || _url[k].indexOf("jpeg") !== -1 || _url[k].indexOf("gif") !== -1 ||
+                _url[k].indexOf("png") !== -1) {
                 _hasImg = true;
             } else {
                 _hasImg = false;
@@ -3499,10 +4345,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3528,7 +4374,15 @@ module.exports = {
     name: "isFormElementInsideFieldSet",
     description: "Use FIELDSET to group form controls into semantic units and describe the group with the LEGEND element.",
     ruleID: "AX_32",
-    tagName: ["BUTTON", "SELECT", "INPUT", "TEXTAREA", "KEYGEN", "DATALIST", "OUTPUT"],
+    tagName: [
+        "BUTTON",
+        "SELECT",
+        "INPUT",
+        "TEXTAREA",
+        "KEYGEN",
+        "DATALIST",
+        "OUTPUT"
+    ],
     handler: _ruleExector
 }
 
@@ -3539,10 +4393,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3579,10 +4433,10 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3591,7 +4445,9 @@ function _ruleExector(elem) {
     //some browsers return this as as DocumentType Object
     _node = document.doctype;
     if (!_.isUndefined(_node) && !_.isNull(_node)) {
-        _htmlDocType = "<!DOCTYPE " + _node.name + (_node.publicId ? ' PUBLIC "' + _node.publicId + '"' : '') + (!_node.publicId && _node.systemId ? ' SYSTEM' : '') + (_node.systemId ? ' "' + _node.systemId + '"' : '') + '>';
+        _htmlDocType = "<!DOCTYPE " + _node.name + (_node.publicId ? ' PUBLIC "' + _node.publicId + '"' : '') +
+            (!_node.publicId && _node.systemId ? ' SYSTEM' : '') + (_node.systemId ? ' "' + _node.systemId + '"' : '') +
+            '>';
     }
 
     if (!_.isEmpty(_htmlDocType) && _.isNull(_node.previousSibling)) {
@@ -3625,10 +4481,10 @@ module.exports = {
  * Rule : "Table TD tags are associated to corresponding TH header tags of the table via the headers attribute"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
- var $ = require("jquery");
- var _ = require("lodash");
- var enums = require("../enums/enums");
- var axsUtils = require("../axs/axsUtils");
+var $ = require("jquery");
+var _ = require("lodash");
+var enums = require("../enums/enums");
+var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3766,7 +4622,6 @@ _rulesArr.push(require("../rulesImpl/AX_32"));
 _rulesArr.push(require("../rulesImpl/AX_33"));
 _rulesArr.push(require("../rulesImpl/AX_34"));
 _rulesArr.push(require("../rulesImpl/AX_35"));
-
 
 //> exports the rulesImpl
 module.exports = _rulesArr;
