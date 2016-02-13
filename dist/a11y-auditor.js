@@ -18,6 +18,7 @@ var $ = require('jquery');
 var _ = require('lodash');
 
 //modules required from within the app
+var appUtils = require("../utils/appUtils");
 var enums = require('../enums/enums');
 var axsUtils = require('../axs/axsUtils');
 var rulesExecutor = require('../rulesProcessor/rulesExecutor');
@@ -25,6 +26,8 @@ var auditRulesCreator = require('../rulesProcessor/auditRulesCreator');
 var ruleTagNameMapper = require('../mapper/ruleTagNameMapper');
 var ruleHandlerMapper = require('../mapper/ruleHandlerMapper');
 var injector = require('../utils/injectDeps');
+
+
 
 //> at this point the rulesExecutor has the array of rules implementations and the auditRulesCreator is also available
 (function(auditRulesCreator, rulesExecutor) {
@@ -34,40 +37,65 @@ var injector = require('../utils/injectDeps');
     });
 })(auditRulesCreator, rulesExecutor);
 
+
+
 var _resultObj = {}, // returns the results of the audit run
     _selectorObjs = {}, // a map that maps an ID to the object extracted from the selectors in the config
     _selectorRules = {}; // a map that maps the same ID to the array of rules to be skipped
 
-/***
- * Export this function which takes in a selctor and configObject
- *
- **/
+
+
+//>Export this function which takes in a selector and configObject
 module.exports = function validator(selector, ignoreSpecific) {
 
-    //if selector is empty or if its not a valid string or if its undefined
-    if (_.isEmpty(selector) && !_.isString(selector) && _.isUndefined(selector)) {
+    //if selector is null / empty or if its undefined
+    if (_.isEmpty(selector) && _.isUndefined(selector)) {
         selector = 'html'; // do the audit for the whole document
     }
-    if ($(selector).length === 0) { //check if the selector gets some DOM element
-        throw new Error('Not a valid selector. Or no matching DOM Elements!');
-    } else {
-        //if ignoreSpecific is not empty & not undefined
-        if (!_.isEmpty(ignoreSpecific) && !_.isUndefined(ignoreSpecific)) {
-            // check if its a valid object
-            if (!_.isObject(ignoreSpecific)) {
-                throw new Error('Configuration options passed is not a valid object');
-            }
-            //> pre-process - do tasks on the config options object that is passed
-            _preProcess(ignoreSpecific);
-        }
-        //execute global executors
-        _globalExecutors();
-        //> run the audit on the current selector that was passed
-        _auditRunner($(selector));
-        //> return the results object
-        return _resultObj;
+
+    //some plugins that consume this, pass a DOM object as well, so adding support to accept DOM objects
+    if(_.isObject(selector)){
+      //now check if its a DOM object else throw an Error
+      if(appUtils.isNode(selector) && appUtils.isElement(selector)){
+        return _conductAudit(ignoreSpecific, selector);
+      }else{
+        throw new Error('Not a valid DOM Object - Node or Element or HTMLElement');
+      }
     }
+
+    //if the selector is a string, then wrap it around with jQuery and send it
+    if(_.isString(selector)){
+      //now check if there is a DOM object that corresponds to the selector, else throw an error
+      if ($(selector).length === 0) {
+          throw new Error('Not a valid selector. Or no matching DOM Elements!');
+      } else {
+          return _conductAudit(ignoreSpecific, $(selector));
+      }
+    }
+
 };
+
+
+//> This function actually begins the process of conducting the audit
+var _conductAudit = function _conductAudit(ignoreSpecific, selector){
+  //if ignoreSpecific is not null / empty & not undefined
+  if (!_.isEmpty(ignoreSpecific) && !_.isUndefined(ignoreSpecific)) {
+      // check if its a valid object
+      if (!_.isObject(ignoreSpecific)) {
+          throw new Error('Configuration options passed is not a valid object');
+      }
+      //> pre-process - do tasks on the config options object that is passed
+      _preProcess(ignoreSpecific);
+  }
+  //execute global executors
+  _globalExecutors();
+  //> run the audit on the current selector that was passed
+  _auditRunner(selector);
+  //> return the results object
+  return _resultObj;
+}
+
+
 
 //> This creates two maps ->
 //> 1) a list of objects extracted from the selectors mentioned in the config object.
@@ -94,6 +122,8 @@ var _preProcess = function _preProcess(config) {
     }
 }
 
+
+
 //> generates a random alpha numeric
 var _randomString = function _randomString(length, chars) {
     var result = '';
@@ -102,6 +132,8 @@ var _randomString = function _randomString(length, chars) {
     }
     return result;
 }
+
+
 
 //> initiates the audit over an array of selectors
 var _auditRunner = function _auditRunner(selectorArr) {
@@ -120,6 +152,8 @@ var _auditRunner = function _auditRunner(selectorArr) {
     }
 }
 
+
+
 //> function to run global rules
 var _globalExecutors = function _globalExecutors() {
     var _globalRules = auditRulesCreator.getGlobalRules(),
@@ -137,6 +171,8 @@ var _globalExecutors = function _globalExecutors() {
         });
     }
 }
+
+
 
 //> process every individual selector from the selector Array
 var _process = function _process(elem) {
@@ -165,6 +201,8 @@ var _process = function _process(elem) {
     }
 };
 
+
+
 //> check if the rule execution must be skipped based on presence of rules against selector in config object
 var _isSkipRule = function _isSkipRule(rule, elem) {
     var _ruleList, _ct, _isSkip = false;
@@ -187,6 +225,8 @@ var _isSkipRule = function _isSkipRule(rule, elem) {
     return _isSkip;
 };
 
+
+
 //> This one console.logs the error info for the rule and the element for which it failed
 var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
     var _key = (!_.isEmpty(element)) ? (_.isEmpty(element.id) ? element.tagName : element.id) : ruleInfoObj.ruleID;
@@ -201,7 +241,7 @@ var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
     });
 };
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"../mapper/ruleHandlerMapper":8,"../mapper/ruleTagNameMapper":9,"../rulesProcessor/auditRulesCreator":45,"../rulesProcessor/rulesExecutor":46,"../utils/injectDeps":48,"jquery":49,"lodash":50}],3:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"../mapper/ruleHandlerMapper":8,"../mapper/ruleTagNameMapper":9,"../rulesProcessor/auditRulesCreator":45,"../rulesProcessor/rulesExecutor":46,"../utils/appUtils":47,"../utils/injectDeps":49,"jquery":50,"lodash":51}],3:[function(require,module,exports){
 /***************************************************************************************
  * dependency injection for rules creation
  * @param
@@ -2692,7 +2732,7 @@ _enums.TagAndSemanticInfoEnum = enumCreator({
 
 module.exports = _enums;
 
-},{"../utils/enumCreator":47}],8:[function(require,module,exports){
+},{"../utils/enumCreator":48}],8:[function(require,module,exports){
 /***************************************************************************************
  * build the auditRules util that exposes method to add rules. This is a ruleID <-> handler mapper
  * @param
@@ -2823,7 +2863,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],11:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],11:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Positive values for TABINDEX must be avoided
@@ -2877,7 +2917,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],12:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],12:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Check for if the current Element has an invalid ARIA attribute
@@ -2950,7 +2990,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../constants/ariaAttributesArray":4,"../enums/enums":7,"jquery":49,"lodash":50}],13:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../constants/ariaAttributesArray":4,"../enums/enums":7,"jquery":50,"lodash":51}],13:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Check if element ID is unique
@@ -3001,7 +3041,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],14:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],14:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : An element's ID must not be present in more that one aria-owns attribute at any time
@@ -3062,7 +3102,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],15:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],15:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Any ID referred to via an IDREF must be unique in the DOM
@@ -3115,7 +3155,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],16:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],16:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : The webpage should have a title that describes topic or purpose which should not be empty
@@ -3163,7 +3203,7 @@ module.exports = {
     isGlobal: true
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],17:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],17:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Provide summaries for tables
@@ -3203,7 +3243,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],18:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],18:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Provide abbreviations for header labels
@@ -3244,7 +3284,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],19:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],19:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Provide a caption via the CAPTION element. A table CAPTION describes the table in one to three sentences"
@@ -3294,7 +3334,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],20:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],20:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Elements with ARIA roles must use a valid, non-abstract ARIA role."
@@ -3381,7 +3421,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../constants/validAriaRolesArr":6,"../enums/enums":7,"jquery":49,"lodash":50}],21:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../constants/validAriaRolesArr":6,"../enums/enums":7,"jquery":50,"lodash":51}],21:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "The web page should have the content's human language indicated in the markup. Identify the primary natural
@@ -3424,7 +3464,7 @@ module.exports = {
     isGlobal: true
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],22:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],22:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "There should be only one main element for a web page document"
@@ -3472,7 +3512,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],23:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],23:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Prsence of Title attribute for ABBR, ACRONYM and A. Specify the expansion of each abbreviation or acronym in
@@ -3521,7 +3561,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],24:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],24:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "This element does not support ARIA roles, states and properties"
@@ -3573,7 +3613,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],25:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],25:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Avoid Deprecated features of W3C technologies"
@@ -3614,7 +3654,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],26:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],26:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Avoid using the style attribute and defining styles inline and move them to stylesheets instead"
@@ -3652,7 +3692,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],27:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],27:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Until user agents handle empty controls correctly, include default placeholding characters in edit boxes and
@@ -3702,7 +3742,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],28:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],28:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Associate labels explicitly with their controls"
@@ -3762,7 +3802,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],29:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],29:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Until user agents provide the ability to stop the refresh, do not create periodically auto-refreshing / auto
@@ -3803,7 +3843,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],30:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],30:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Until user agents allow users to turn off spawned windows, do not cause pop-ups or other windows to appear
@@ -3847,7 +3887,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],31:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],31:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Ensure that pages are usable when scripts, applets, or other programmatic objects are turned off or not
@@ -3888,7 +3928,7 @@ module.exports = {
     isGlobal: true
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],32:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],32:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Provide keyboard shortcuts to important links (including those in client-side image maps), form controls,
@@ -3936,7 +3976,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],33:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],33:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check if there is atleast one header section / element for the page content that defines its purpose &
@@ -4000,7 +4040,7 @@ module.exports = {
     isGlobal: true
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],34:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],34:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "role=main must be present on significant elements only"
@@ -4057,7 +4097,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],35:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],35:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Avoid using the style attribute and defining styles inline and move them to stylesheets instead"
@@ -4109,7 +4149,7 @@ module.exports = {
     isGlobal: true
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],36:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],36:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check if there is a link that helps skip irrelevant information and land the user at the main content"
@@ -4161,7 +4201,7 @@ module.exports = {
     isGlobal: true
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],37:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],37:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check if PRE elements are used. Ensure that there are no TABLE based layouts in it"
@@ -4199,7 +4239,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],38:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],38:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Don't use the <B> and <I> tags. They are used to create a visual presentation effect"
@@ -4240,7 +4280,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],39:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],39:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Provide text equivalent for every non-text element like OBJECT"
@@ -4278,7 +4318,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],40:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],40:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Ensure that equivalents for dynamic content are updated when the dynamic content changes. As the contents of
@@ -4339,7 +4379,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],41:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],41:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Use FIELDSET to group form controls into semantic units and describe the group with the LEGEND element."
@@ -4387,7 +4427,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],42:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],42:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Use FIELDSET to group form controls into semantic units and describe the group with the LEGEND element."
@@ -4427,7 +4467,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],43:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],43:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check for presence of a DOCTYPE"
@@ -4476,7 +4516,7 @@ module.exports = {
     isGlobal: true
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],44:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],44:[function(require,module,exports){
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Table TD tags are associated to corresponding TH header tags of the table via the headers attribute"
@@ -4524,7 +4564,7 @@ module.exports = {
     handler: _ruleExector
 }
 
-},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":49,"lodash":50}],45:[function(require,module,exports){
+},{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],45:[function(require,module,exports){
 /***************************************************************************************
  * build the auditRules util that exposes method to add rules. This is a ruleID <-> RuleInfoObj mapper
  * @param
@@ -4584,7 +4624,7 @@ module.exports = {
     getGlobalRules: _getGlobalRules
 }
 
-},{"../constants/tagNamesArray":5,"../mapper/ruleHandlerMapper":8,"../mapper/ruleTagNameMapper":9,"lodash":50}],46:[function(require,module,exports){
+},{"../constants/tagNamesArray":5,"../mapper/ruleHandlerMapper":8,"../mapper/ruleTagNameMapper":9,"lodash":51}],46:[function(require,module,exports){
 //> array that holds all the rules
 var _rulesArr = [];
 
@@ -4628,6 +4668,25 @@ _rulesArr.push(require("../rulesImpl/AX_35"));
 module.exports = _rulesArr;
 
 },{"../rulesImpl/AX_01":10,"../rulesImpl/AX_02":11,"../rulesImpl/AX_03":12,"../rulesImpl/AX_04":13,"../rulesImpl/AX_05":14,"../rulesImpl/AX_06":15,"../rulesImpl/AX_07":16,"../rulesImpl/AX_08":17,"../rulesImpl/AX_09":18,"../rulesImpl/AX_10":19,"../rulesImpl/AX_11":20,"../rulesImpl/AX_12":21,"../rulesImpl/AX_13":22,"../rulesImpl/AX_14":23,"../rulesImpl/AX_15":24,"../rulesImpl/AX_16":25,"../rulesImpl/AX_17":26,"../rulesImpl/AX_18":27,"../rulesImpl/AX_19":28,"../rulesImpl/AX_20":29,"../rulesImpl/AX_21":30,"../rulesImpl/AX_22":31,"../rulesImpl/AX_23":32,"../rulesImpl/AX_24":33,"../rulesImpl/AX_25":34,"../rulesImpl/AX_26":35,"../rulesImpl/AX_27":36,"../rulesImpl/AX_28":37,"../rulesImpl/AX_29":38,"../rulesImpl/AX_30":39,"../rulesImpl/AX_31":40,"../rulesImpl/AX_32":41,"../rulesImpl/AX_33":42,"../rulesImpl/AX_34":43,"../rulesImpl/AX_35":44}],47:[function(require,module,exports){
+module.exports = {
+    //Returns true if it is a DOM node
+    isNode: function(o) {
+        return (
+            typeof Node === "object" ? o instanceof Node :
+            o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string"
+        );
+    },
+
+    //Returns true if it is a DOM element
+    isElement: function(o) {
+        return (
+            typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
+        );
+    }
+}
+
+},{}],48:[function(require,module,exports){
 /***************************************************************************************
  * This is a simple immutable enumCreator
  * @param obj that needs to be made as an Enum
@@ -4654,7 +4713,7 @@ Object.freeze(EnumGen.prototype);
 
 module.exports = EnumGen; //> return the enum constructor
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /***************************************************************************************
  * dependency injection for rules creation
  * @param
@@ -4687,7 +4746,7 @@ module.exports = {
     }
 };
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.0
  * http://jquery.com/
@@ -14520,7 +14579,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 (function (global){
 /**
  * @license
