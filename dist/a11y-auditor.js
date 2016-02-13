@@ -48,6 +48,9 @@ var _resultObj = {}, // returns the results of the audit run
 //>Export this function which takes in a selector and configObject
 module.exports = function validator(selector, ignoreSpecific, ignoreGlobalRules) {
 
+    //> for every invocation of the auditor, the result object has to be unique. No aggregation of results
+    _resultObj = {}, _selectorObjs = {}, _selectorRules = {};
+
     //if selector is null / empty or if its undefined
     if (_.isEmpty(selector) && _.isUndefined(selector)) {
         selector = 'html'; // do the audit for the whole document
