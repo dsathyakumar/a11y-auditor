@@ -46,7 +46,7 @@ var _resultObj = {}, // returns the results of the audit run
 
 
 //>Export this function which takes in a selector and configObject
-module.exports = function validator(selector, ignoreSpecific) {
+module.exports = function validator(selector, ignoreSpecific, ignoreGlobalRules) {
 
     //if selector is null / empty or if its undefined
     if (_.isEmpty(selector) && _.isUndefined(selector)) {
@@ -57,7 +57,7 @@ module.exports = function validator(selector, ignoreSpecific) {
     if(_.isObject(selector)){
       //now check if its a DOM object else throw an Error
       if(appUtils.isNode(selector) && appUtils.isElement(selector)){
-        return _conductAudit(ignoreSpecific, selector);
+        return _conductAudit(ignoreSpecific, selector, ignoreGlobalRules);
       }else{
         throw new Error('Not a valid DOM Object - Node or Element or HTMLElement');
       }
@@ -69,7 +69,7 @@ module.exports = function validator(selector, ignoreSpecific) {
       if ($(selector).length === 0) {
           throw new Error('Not a valid selector. Or no matching DOM Elements!');
       } else {
-          return _conductAudit(ignoreSpecific, $(selector));
+          return _conductAudit(ignoreSpecific, $(selector), ignoreGlobalRules);
       }
     }
 
@@ -77,7 +77,7 @@ module.exports = function validator(selector, ignoreSpecific) {
 
 
 //> This function actually begins the process of conducting the audit
-var _conductAudit = function _conductAudit(ignoreSpecific, selector){
+var _conductAudit = function _conductAudit(ignoreSpecific, selector, ignoreGlobalRules){
   //if ignoreSpecific is not null / empty & not undefined
   if (!_.isEmpty(ignoreSpecific) && !_.isUndefined(ignoreSpecific)) {
       // check if its a valid object
@@ -87,10 +87,15 @@ var _conductAudit = function _conductAudit(ignoreSpecific, selector){
       //> pre-process - do tasks on the config options object that is passed
       _preProcess(ignoreSpecific);
   }
-  //execute global executors
-  _globalExecutors();
+  //execute global Rules only when the ignoreGlobalRules is FALSE
+  if (!_.isUndefined(ignoreGlobalRules) && _.isBoolean(ignoreGlobalRules)) {
+    if(!ignoreGlobalRules){
+        _globalExecutors();
+    }
+  }
   //> run the audit on the current selector that was passed
   _auditRunner(selector);
+
   //> return the results object
   return _resultObj;
 }
