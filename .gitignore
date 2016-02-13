@@ -1,4 +1,5 @@
 # directories
 node_modules/
 .docs/
+.coverage/
 .idea

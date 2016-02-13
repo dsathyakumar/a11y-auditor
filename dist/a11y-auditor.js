@@ -192,6 +192,7 @@ var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
     var _key = (!_.isEmpty(element)) ? (_.isEmpty(element.id) ? element.tagName : element.id) : ruleInfoObj.ruleID;
     _resultObj[_key] = _resultObj[_key] || [];
     _resultObj[_key].push({
+        result : errorObj.RESULT,
         severityEnum: errorObj.TYPE,
         description: ruleInfoObj.description,
         errMsg: errorObj.MSG,
