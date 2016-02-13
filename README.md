@@ -42,6 +42,7 @@ var result = a11y(htmlSelector, configRulesObj, ignoreGlobalRules);
 
 1. A valid HTML selector
 2. A config object containing rules to be ignored for some elements matched by valid HTML selectors as shown below
+3. A Boolean to indicate whether global rules that audit the whole document need to be ignored.
 
 
 To ignore a few rules :
