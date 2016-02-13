@@ -14,7 +14,7 @@ require the module as require('a11y-auditor') and add it to the dependencies. Th
 ```
 var a11y = require('a11y-auditor');
 
-var result = a11y(htmlSelector, configRulesObj);
+var result = a11y(htmlSelector, configRulesObj, ignoreGlobalRules);
 ```
 
 
@@ -24,19 +24,19 @@ Use the distribution file at dist/browser/main.js. Implement it as :
 
 ```
 window.onload = function(){
-		a11y-auditor(htmlSelector, configRulesObj);
+		a11y-auditor(htmlSelector, configRulesObj, ignoreGlobalRules);
 }
 ```
 
 Method definition of method exported by the Module :
 --------------------------------------------------
 
-The method takes in 2 parameters:
+The method takes in 3 parameters:
 
 ```
 var a11y = require('a11y-auditor');
 
-var result = a11y(htmlSelector, configRulesObj);
+var result = a11y(htmlSelector, configRulesObj, ignoreGlobalRules);
 
 ```
 
