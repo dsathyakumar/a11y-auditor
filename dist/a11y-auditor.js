@@ -60,7 +60,7 @@ module.exports = function validator(selector, ignoreSpecific, ignoreGlobalRules)
     if(_.isObject(selector)){
       //now check if its a DOM object else throw an Error
       if(appUtils.isNode(selector) && appUtils.isElement(selector)){
-        return _conductAudit(ignoreSpecific, selector, ignoreGlobalRules);
+        return _conductAudit($(selector), ignoreSpecific, ignoreGlobalRules);
       }else{
         throw new Error('Not a valid DOM Object - Node or Element or HTMLElement');
       }
@@ -72,7 +72,7 @@ module.exports = function validator(selector, ignoreSpecific, ignoreGlobalRules)
       if ($(selector).length === 0) {
           throw new Error('Not a valid selector. Or no matching DOM Elements!');
       } else {
-          return _conductAudit(ignoreSpecific, $(selector), ignoreGlobalRules);
+          return _conductAudit($(selector), ignoreSpecific, ignoreGlobalRules);
       }
     }
 
@@ -80,7 +80,7 @@ module.exports = function validator(selector, ignoreSpecific, ignoreGlobalRules)
 
 
 //> This function actually begins the process of conducting the audit
-var _conductAudit = function _conductAudit(ignoreSpecific, selector, ignoreGlobalRules){
+var _conductAudit = function _conductAudit(selector, ignoreSpecific, ignoreGlobalRules){
   //if ignoreSpecific is not null / empty & not undefined
   if (!_.isEmpty(ignoreSpecific) && !_.isUndefined(ignoreSpecific)) {
       // check if its a valid object
@@ -187,7 +187,7 @@ var _process = function _process(elem) {
     var _rulesArr, _fn, _result;
     //get the array of rules corresponding to the tagName to execute (tagName <->['Rule1', 'Rule2'])
     _rulesArr = ruleTagNameMapper.getTagHandlers(elem.tagName);
-
+    console.log(_rulesArr);
     //check if the _rulesArr is empty before iterating
     if (!_.isEmpty(_rulesArr) && !_.isUndefined(_rulesArr)) {
         //inject the element as one of the dependencies into the injector
@@ -245,6 +245,7 @@ var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
         description: ruleInfoObj.description,
         errMsg: errorObj.MSG,
         ruleID: ruleInfoObj.ruleID,
+        isGlobal : ruleInfoObj.isGlobal,
         attr: (!_.isEmpty(element)) ? element.attributes : null
     });
 };
@@ -2868,7 +2869,8 @@ module.exports = {
         "IMG",
         "INPUT"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],11:[function(require,module,exports){
@@ -2922,7 +2924,8 @@ module.exports = {
         "SELECT",
         "BUTTON"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],12:[function(require,module,exports){
@@ -2995,7 +2998,8 @@ module.exports = {
     description: "The element has an invalid ARIA attribute",
     ruleID: "AX_03",
     tagName: ["*"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../constants/ariaAttributesArray":4,"../enums/enums":7,"jquery":50,"lodash":51}],13:[function(require,module,exports){
@@ -3046,7 +3050,8 @@ module.exports = {
     description: "Check if element ID is unique",
     ruleID: "AX_04",
     tagName: ["*"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],14:[function(require,module,exports){
@@ -3107,7 +3112,8 @@ module.exports = {
         "SELECT",
         "BUTTON"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],15:[function(require,module,exports){
@@ -3160,7 +3166,8 @@ module.exports = {
     description: "Any ID referred to via an IDREF must be unique in the DOM",
     ruleID: "AX_06",
     tagName: ["*"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],16:[function(require,module,exports){
@@ -3248,7 +3255,8 @@ module.exports = {
     description: "Provide summaries for tables",
     ruleID: "AX_08",
     tagName: ["TABLE"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],18:[function(require,module,exports){
@@ -3289,7 +3297,8 @@ module.exports = {
     description: "Provide abbreviations for header labels",
     ruleID: "AX_09",
     tagName: ["TH"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],19:[function(require,module,exports){
@@ -3339,7 +3348,8 @@ module.exports = {
     description: "Provide a caption via the CAPTION element. A table CAPTION describes the table in one to three sentences",
     ruleID: "AX_10",
     tagName: ["TABLE"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],20:[function(require,module,exports){
@@ -3426,7 +3436,8 @@ module.exports = {
     description: "Elements with ARIA roles must use a valid, non-abstract ARIA role.",
     ruleID: "AX_11",
     tagName: ["*"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../constants/validAriaRolesArr":6,"../enums/enums":7,"jquery":50,"lodash":51}],21:[function(require,module,exports){
@@ -3517,7 +3528,8 @@ module.exports = {
         "H5",
         "H6"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],23:[function(require,module,exports){
@@ -3566,7 +3578,8 @@ module.exports = {
         "MAP",
         "APPLET"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],24:[function(require,module,exports){
@@ -3618,7 +3631,8 @@ module.exports = {
     description: "This element does not support ARIA roles, states and properties",
     ruleID: "AX_15",
     tagName: ["*"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],25:[function(require,module,exports){
@@ -3659,7 +3673,8 @@ module.exports = {
         "STRIKE",
         "U"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],26:[function(require,module,exports){
@@ -3697,7 +3712,8 @@ module.exports = {
     description: "Avoid using the style attribute and defining styles inline and move them to stylesheets instead",
     ruleID: "AX_17",
     tagName: ["*"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],27:[function(require,module,exports){
@@ -3747,7 +3763,8 @@ module.exports = {
         "SELECT",
         "TEXTAREA"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],28:[function(require,module,exports){
@@ -3807,7 +3824,8 @@ module.exports = {
         "KEYGEN",
         "OUTPUT"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],29:[function(require,module,exports){
@@ -3848,7 +3866,8 @@ module.exports = {
     description: "Until user agents provide the ability to stop the refresh, do not create periodically auto-refreshing / auto re-direct pages",
     ruleID: "AX_20",
     tagName: ["META"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],30:[function(require,module,exports){
@@ -3892,7 +3911,8 @@ module.exports = {
         "A",
         "IFRAME"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],31:[function(require,module,exports){
@@ -3981,7 +4001,8 @@ module.exports = {
         "LEGEND",
         "SELECT"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],33:[function(require,module,exports){
@@ -4102,7 +4123,8 @@ module.exports = {
     description: "role=main must be present on significant elements only",
     ruleID: "AX_25",
     tagName: ["*"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],35:[function(require,module,exports){
@@ -4244,7 +4266,8 @@ module.exports = {
     description: "Check if PRE elements are used. Ensure that there are no TABLE based layouts in it",
     ruleID: "AX_28",
     tagName: ["PRE"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],38:[function(require,module,exports){
@@ -4285,7 +4308,8 @@ module.exports = {
         "B",
         "I"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],39:[function(require,module,exports){
@@ -4323,7 +4347,8 @@ module.exports = {
     description: "Provide text equivalent for every non-text element like OBJECT",
     ruleID: "AX_30",
     tagName: ["OBJECT"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],40:[function(require,module,exports){
@@ -4384,7 +4409,8 @@ module.exports = {
     description: "Ensure that equivalents for dynamic content are updated when the dynamic content changes. As the contents of a frame changes, so must change any description. This is not possible if an IMG is inserted directly into a frame. Thus, content developers should always make the source ('src') of a frame an HTML file",
     ruleID: "AX_31",
     tagName: ["IFRAME"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],41:[function(require,module,exports){
@@ -4432,7 +4458,8 @@ module.exports = {
         "DATALIST",
         "OUTPUT"
     ],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],42:[function(require,module,exports){
@@ -4472,7 +4499,8 @@ module.exports = {
     description: "Describe the FIELDSET group with the LEGEND element.",
     ruleID: "AX_33",
     tagName: ["FIELDSET"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],43:[function(require,module,exports){
@@ -4569,7 +4597,8 @@ module.exports = {
     description: "Table TD tags are to be associated to corresponding TH header tags of the table via the headers attribute",
     ruleID: "AX_35",
     tagName: ["TD"],
-    handler: _ruleExector
+    handler: _ruleExector,
+    isGlobal: false
 }
 
 },{"../axs/axsUtils":3,"../enums/enums":7,"jquery":50,"lodash":51}],45:[function(require,module,exports){
