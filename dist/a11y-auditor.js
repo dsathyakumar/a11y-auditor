@@ -187,7 +187,7 @@ var _process = function _process(elem) {
     var _rulesArr, _fn, _result;
     //get the array of rules corresponding to the tagName to execute (tagName <->['Rule1', 'Rule2'])
     _rulesArr = ruleTagNameMapper.getTagHandlers(elem.tagName);
-    console.log(_rulesArr);
+
     //check if the _rulesArr is empty before iterating
     if (!_.isEmpty(_rulesArr) && !_.isUndefined(_rulesArr)) {
         //inject the element as one of the dependencies into the injector
