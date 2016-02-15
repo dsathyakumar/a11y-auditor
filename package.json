@@ -1,6 +1,6 @@
 {
     "name": "a11y-auditor",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "This a11y project is an implementation of accessibility rules as defined in W3C Accessibility Checklist",
     "main": "a11y-auditor.js",
     "author": "dsathyakumar <gautham.daamodhar@gmail.com>",
