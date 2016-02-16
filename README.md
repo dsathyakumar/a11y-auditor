@@ -1,9 +1,6 @@
 [![Build Status](https://img.shields.io/travis/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://travis-ci.org/dsathyakumar/a11y-auditor)
-
 [![Dependency Status](https://img.shields.io/david/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor)
-
 [![devDependency Status](https://img.shields.io/david/dev/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor#info=devDependencies)
-
 [![peerDependency Status](https://img.shields.io/david/peer/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor#info=peerDependencies)
 
 # a11y-auditor
