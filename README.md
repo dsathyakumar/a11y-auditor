@@ -1,9 +1,6 @@
 # a11y-auditor
 
-This a11y project is an implementation of accessibility rules as defined in
-Accessibility Checklist:
-
-http://www.w3.org/TR/WCAG10/full-checklist.html
+> This a11y project is an implementation of accessibility rules as defined in [Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
 **NPM MODULE**
 The corresponding NPM module of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
