@@ -21,8 +21,7 @@ The great way would be to include it as part of your Dev tests itself via the ch
 
 [chai-a11y](https://github.com/pranavjha/chai-a11y) is a chai plugin available as an [npm](https://github.com/pranavjha/chai-a11y) module which consumes a11y-auditor and helps run tests and conduct audits.
 
-[chai-a11y](https://github.com/pranavjha/chai-a11y) helps to run a11y-auditor on the browser (AMD, common JS style) and also
-via script tag loading
+[chai-a11y](https://github.com/pranavjha/chai-a11y) helps to run a11y-auditor on a headless phantomJS instance (AMD, common JS style) and also via script tag loading.
 
 
 
