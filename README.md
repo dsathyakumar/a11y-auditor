@@ -14,7 +14,7 @@
 **Pull requests are welcome!**
 
 
-### TIP :
+#### TIP :
 ---------------------------------------------------------
 Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages.
 
@@ -26,7 +26,7 @@ The great way would be to include it as part of your Dev tests itself via the ch
 
 
 
-### For Node JS usage :
+#### For Node JS usage :
 ---------------------------------------------------------
 require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function validator()]. Use it in your module.
 
@@ -37,7 +37,7 @@ var result = a11y(htmlSelector, configRulesObj, executeGlobalRules);
 ```
 
 
-### For Browser usage (include <script...> and run without AMD):
+#### For Browser usage (include <script...> and run without AMD):
 ---------------------------------------------------------
 Use the distribution file at dist/browser/main.js. Implement it as :
 
@@ -49,7 +49,7 @@ window.onload = function(){
 
 
 
-### Method definition of method exported by the Module :
+#### Method definition of method exported by the Module :
 --------------------------------------------------
 
 The method takes in 3 parameters:
@@ -66,7 +66,7 @@ var result = a11y(htmlSelector, configRulesObj, executeGlobalRules);
 3. executeGlobalRules - A Boolean to indicate whether global rules that audit the whole document need to be ignored.
 
 
-### To ignore a few rules :
+#### To ignore a few rules :
 -----------------------
 
 ```
@@ -78,7 +78,7 @@ function(“htmlSelector”, {
 ```
 
 
-### To author new rules :
+#### To author new rules :
 ---------------------------------------------------------
 1. Create a new numbered rule named file AX_XX.js (eg: AX_01.js) under lib/rulesImpl
 2. Follow the pattern in which the files are authored under lib/rulesImpl
@@ -97,19 +97,19 @@ module.exports = {
 ```
 
 
-### Implementation Tests :
+#### Implementation Tests :
 --------------------
 
 Individual tests for each of the rules implemented have been placed under tests
 
 
-### Rule Understanding:
+#### Rule Understanding:
 --------------------
 
 To know what each rule does, look at the a11y.properties.json file.
 
 
-### Dependencies :
+#### Dependencies :
 --------------------
 
 jQuery library (v 2.2.0), lodash (4.3.0)
