@@ -2,7 +2,7 @@
 [![Dependency Status](https://img.shields.io/david/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor)
 [![devDependency Status](https://img.shields.io/david/dev/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor#info=devDependencies)
 [![peerDependency Status](https://img.shields.io/david/peer/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor#info=peerDependencies)
-[![npm](https://img.shields.io/npm/v/a11y-auditor.svg)]
+[npm](https://img.shields.io/npm/v/a11y-auditor.svg)
 
 # a11y-auditor
 
