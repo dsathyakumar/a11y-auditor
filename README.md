@@ -5,17 +5,25 @@ Accessibility Checklist:
 
 http://www.w3.org/TR/WCAG10/full-checklist.html
 
-> Status : Dev (in progress), to make it compatible with Front end loading (via AMD loaders and script tag loading)
+**NPM MODULE**
+The corresponding NPM module of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
 
-** Pull requests are welcome. **
+> Status : Dev (in progress)
+
+**Pull requests are welcome!**
 
 
 TIP :
 ---------------------------------------------------------
 Its recommended to use a11y-auditor to run audit checks for A, AA, AAA compliance on your web pages.
+
 The great way would be to include it as part of your Dev tests itself via the chai-a11y plugin.
-[chai-a11y]https://github.com/pranavjha/chai-a11y is a chai plugin available as an npm module which
-consumes a11y-auditor and helps run tests and conduct audits.
+
+[chai-a11y](https://github.com/pranavjha/chai-a11y) is a chai plugin available as an [npm](https://github.com/pranavjha/chai-a11y) module which consumes a11y-auditor and helps run tests and conduct audits.
+
+[chai-a11y](https://github.com/pranavjha/chai-a11y) helps to run a11y-auditor on the browser (AMD, common JS style) and also
+via script tag loading
+
 
 
 For Node JS usage :
@@ -29,7 +37,7 @@ var result = a11y(htmlSelector, configRulesObj, executeGlobalRules);
 ```
 
 
-For Browser usage (include script and run without AMD):
+For Browser usage (include <script...> and run without AMD):
 ---------------------------------------------------------
 Use the distribution file at dist/browser/main.js. Implement it as :
 
@@ -38,6 +46,8 @@ window.onload = function(){
 		a11y-auditor(htmlSelector, configRulesObj, executeGlobalRules);
 }
 ```
+
+
 
 Method definition of method exported by the Module :
 --------------------------------------------------
@@ -59,7 +69,6 @@ var result = a11y(htmlSelector, configRulesObj, executeGlobalRules);
 To ignore a few rules :
 -----------------------
 
-
 ```
 function(“htmlSelector”, {
 	‘selector_1’ : [‘array of rules to ignore’],
@@ -80,7 +89,7 @@ To author new rules :
 module.exports = {
 	name: "shortNameMentioningWhatThisRuleDoes",
 	description: "Detailed description of the rule",
-	ruleID: "AX_01",
+	ruleID: "AX_XXX",
 	tagName: ['array of tagName affected'],
 	handler: Handler function,
 	isGlobal: Boolean //to indicate if this rule checks on document level checks
