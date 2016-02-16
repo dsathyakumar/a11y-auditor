@@ -7,8 +7,7 @@
 
 > This a11y project is an implementation of accessibility rules as defined in [Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
-**NPM MODULE**
-The corresponding NPM module of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
+> **NPM MODULE** of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
 
 > Status : Dev (in progress)
 
@@ -17,7 +16,7 @@ The corresponding NPM module of [a11y-auditor](https://www.npmjs.com/package/a11
 
 TIP :
 ---------------------------------------------------------
-Its recommended to use a11y-auditor to run audit checks for A, AA, AAA compliance on your web pages.
+Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages.
 
 The great way would be to include it as part of your Dev tests itself via the chai-a11y plugin.
 
