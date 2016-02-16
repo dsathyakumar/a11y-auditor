@@ -17,9 +17,7 @@
 
 #### TIP :
 ---------------------------------------------------------
-Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages.
-
-The great way would be to include it as part of your Dev tests itself via the chai-a11y plugin.
+Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages as part of your Dev testing (unit tests) itself via the chai-a11y plugin.
 
 [chai-a11y](https://github.com/pranavjha/chai-a11y) is a chai plugin available as an [npm](https://github.com/pranavjha/chai-a11y) module which consumes a11y-auditor and helps run tests and conduct audits.
 
@@ -82,8 +80,8 @@ function(“htmlSelector”, {
 #### To author new rules :
 ---------------------------------------------------------
 1. Create a new numbered rule named file AX_XX.js (eg: AX_01.js) under lib/rulesImpl
-2. Follow the pattern in which the files are authored under lib/rulesImpl
-3. Place an entry in lib/rulesProcessor/rulesExecutor.js
+2. Follow the pattern in which the files are authored under lib/rulesImpl/AX_XXX.js
+3. Place an entry in lib/rulesProcessor/rulesExecutor.js (for the auditRunner to pick up your rule)
 4. The exported object via module.exports will contain the following:
 
 ```
@@ -113,4 +111,4 @@ To know what each rule does, look at the a11y.properties.json file.
 #### Dependencies :
 --------------------
 
-jQuery library (v 2.2.0), lodash (4.3.0)
+jQuery (v 2.2.0), lodash (4.3.0)
