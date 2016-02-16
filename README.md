@@ -2,6 +2,7 @@
 [![Dependency Status](https://img.shields.io/david/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor)
 [![devDependency Status](https://img.shields.io/david/dev/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor#info=devDependencies)
 [![peerDependency Status](https://img.shields.io/david/peer/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor#info=peerDependencies)
+[![npm](https://img.shields.io/npm/v/a11y-auditor.svg)]
 
 # a11y-auditor
 
@@ -31,9 +32,9 @@ The great way would be to include it as part of your Dev tests itself via the ch
 require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function validator()]. Use it in your module.
 
 ```
-var a11y = require('a11y-auditor');
+var auditRunner = require('a11y-auditor');
 
-var result = a11y(htmlSelector, configRulesObj, executeGlobalRules);
+var result = auditRunner(htmlSelector, configRulesObj, executeGlobalRules);
 ```
 
 
@@ -43,7 +44,7 @@ Use the distribution file at dist/browser/main.js. Implement it as :
 
 ```
 window.onload = function(){
-		a11y-auditor(htmlSelector, configRulesObj, executeGlobalRules);
+		auditRunner(htmlSelector, configRulesObj, executeGlobalRules);
 }
 ```
 
@@ -55,9 +56,9 @@ window.onload = function(){
 The method takes in 3 parameters:
 
 ```
-var a11y = require('a11y-auditor');
+var auditRunner = require('a11y-auditor');
 
-var result = a11y(htmlSelector, configRulesObj, executeGlobalRules);
+var result = auditRunner(htmlSelector, configRulesObj, executeGlobalRules);
 
 ```
 
@@ -73,8 +74,8 @@ var result = a11y(htmlSelector, configRulesObj, executeGlobalRules);
 function(“htmlSelector”, {
 	‘selector_1’ : [‘array of rules to ignore’],
 	‘selector_2’ : [‘array of rules to ignore’],
-	‘selector_3’ : [‘*’] //skip all
-});
+	‘selector_3’ : [‘*’] //* will skip all rules for the selector
+},false);
 ```
 
 
@@ -91,7 +92,7 @@ module.exports = {
 	description: "Detailed description of the rule",
 	ruleID: "AX_XXX",
 	tagName: ['array of tagName affected'],
-	handler: Handler function,
+	handler: Handler function Implementation,
 	isGlobal: Boolean //to indicate if this rule checks on document level checks
 };
 ```
