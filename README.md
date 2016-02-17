@@ -10,7 +10,7 @@
 
 # a11y-auditor
 
-> This a11y project is an implementation of accessibility rules as defined in [Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
+> This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
 > **NPM MODULE** of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
 
@@ -105,14 +105,14 @@ module.exports = {
 
 | Directory  | Description |
 | -----------| ------------- |
-| lib/auditRunner  | The engine that performs the audit  |
+| lib/auditRunner  | The engine that recursively iterates & performs the audit & exposes an interface to consume  |
 | lib/constants  | Constants / Enums  |
 | lib/axs  | Utils for certain rules  |
 | lib/enums  | List of enums  |
 | lib/mapper  | Mapper functions that map rules to handler and tagName  |
-| lib/rulesImpl  | Implementation functions that contain rule implementation  |
-| lib/rulesProcessor  | Code to pick up rules and add it to an auditRulesCreator  |
-| lib/utils  | Code containing utils for enum creation and dependency injections  |
+| lib/rulesImpl  | Implementation functions that contain the rule implementation  |
+| lib/rulesProcessor  | Code to pick up rules and add it to the auditRulesCreator  |
+| lib/utils  | Code containing utils for enum creation, DOM object checks and dependency injections  |
 
 
 #### Implementation Tests :
