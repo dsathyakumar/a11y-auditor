@@ -100,6 +100,21 @@ module.exports = {
 ```
 
 
+#### File Structure :
+--------------------
+
+| Directory  | Description |
+| -----------| ------------- |
+| lib/auditRunner  | The engine that performs the audit  |
+| lib/constants  | Constants / Enums  |
+| lib/axs  | Utils for certain rules  |
+| lib/enums  | List of enums  |
+| lib/mapper  | Mapper functions that map rules to handler and tagName  |
+| lib/rulesImpl  | Implementation functions that contain rule implementation  |
+| lib/rulesProcessor  | Code to pick up rules and add it to an auditRulesCreator  |
+| lib/utils  | Code containing utils for enum creation and dependency injections  |
+
+
 #### Implementation Tests :
 --------------------
 
