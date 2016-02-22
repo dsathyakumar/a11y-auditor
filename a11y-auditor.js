@@ -2,10 +2,10 @@
 //global.__base = __dirname + '/';
 
 // load the audit runner and export it
-var auditRunner = require('./lib/audit/auditRunner');
+var auditInitializer = require('./lib/audit/auditInitializer');
 
 if (typeof window !== 'undefined') {
-    window.auditRunner = auditRunner;
+    window.auditRunner = auditInitializer;
 }
 
-module.exports = auditRunner;
+module.exports = auditInitializer;

@@ -36,7 +36,7 @@ require the module as require('a11y-auditor') and add it to the dependencies. Th
 ```
 var auditRunner = require('a11y-auditor');
 
-var result = auditRunner(htmlSelector, configRulesObj, executeGlobalRules);
+var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
 ```
 
 
@@ -46,7 +46,7 @@ Use the distribution file at dist/browser/main.js. Implement it as :
 
 ```
 window.onload = function(){
-		auditRunner(htmlSelector, configRulesObj, executeGlobalRules);
+		auditRunner(htmlSelector, rulesConfig, auditConfig);
 }
 ```
 
@@ -60,13 +60,18 @@ The method takes in 3 parameters:
 ```
 var auditRunner = require('a11y-auditor');
 
-var result = auditRunner(htmlSelector, configRulesObj, executeGlobalRules);
+var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
 
 ```
 
 1. htmlSelector - A valid HTML selector (eg. 'button')
-2. configRulesObj - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
-3. executeGlobalRules - A Boolean to indicate whether global rules that audit the whole document need to be ignored.
+2. rulesConfig - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
+3. auditConfig - A Boolean to indicate whether global rules that audit the whole document need to be ignored.
+
+auditConfig takes in 2 properties / keys :
+
+- 'executeGlobalRules': Boolean to indicate whether Global rules need to be executed or not
+- 'compliance' : Takes one of the 3 strings : 'A', 'AA', 'AAA'.
 
 
 #### To ignore a few rules :
@@ -77,7 +82,10 @@ function(“htmlSelector”, {
 	‘selector_1’ : [‘array of rules to ignore’],
 	‘selector_2’ : [‘array of rules to ignore’],
 	‘selector_3’ : [‘*’] //* will skip all rules for the selector
-},false);
+},{
+	executeGlobalRules : true,
+	compliance : 'AA'
+	});
 ```
 
 
@@ -95,7 +103,8 @@ module.exports = {
 	ruleID: "AX_XXX",
 	tagName: ['array of tagName affected'],
 	handler: Handler function Implementation,
-	isGlobal: Boolean //to indicate if this rule checks on document level checks
+	isGlobal: Boolean //to indicate if this rule checks on document level checks,
+	compliance : 'AA'
 };
 ```
 
