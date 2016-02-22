@@ -330,6 +330,7 @@ var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
         errMsg: errorObj.MSG,
         ruleID: ruleInfoObj.ruleID,
         isGlobal : ruleInfoObj.isGlobal,
+        compliance : ruleInfoObj.compliance,
         attr: (!_.isEmpty(element)) ? element.attributes : null
     });
 };
@@ -2990,6 +2991,7 @@ module.exports = {
         "INPUT"
     ],
     handler: _ruleExector,
+    compliance : 'A',
     isGlobal: false
 }
 
