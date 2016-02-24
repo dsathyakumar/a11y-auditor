@@ -2991,7 +2991,6 @@ module.exports = {
         "INPUT"
     ],
     handler: _ruleExector,
-    compliance : 'A',
     isGlobal: false
 }
 
@@ -3641,17 +3640,9 @@ module.exports = {
     name: "hasMoreThanOneRoleMain",
     description: "There should be only one main element for a web page document",
     ruleID: "AX_13",
-    tagName: [
-        "DIV",
-        "H1",
-        "H2",
-        "H3",
-        "H4",
-        "H5",
-        "H6"
-    ],
+    tagName: [],
     handler: _ruleExector,
-    isGlobal: false
+    isGlobal: true
 }
 
 },{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],25:[function(require,module,exports){
