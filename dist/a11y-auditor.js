@@ -3073,7 +3073,8 @@ function _ruleExector(elem) {
     //> iterate over the attributes array of the element and check if any aria-* exists
     [].forEach.call(elem.attributes, function(attr) {
         if (/^aria-/.test(attr.name)) {
-            _data.push("".toLowerCase(attr.name));
+            attr.name = "".toLowerCase(attr.name);
+            _data.push(attr.name);
         }
     });
 
