@@ -48,7 +48,7 @@ describe('AX_01', function() {
         var result = AX_01.handler.call(null,imgString);
 
         //validate the result
-        expect(result.RESULT).to.equal(false);
+        expect(result.TYPE).to.equal('warning');
     });
 
     //> Test case : 3
@@ -77,7 +77,7 @@ describe('AX_01', function() {
         var result = AX_01.handler.call(null,imgString);
 
         //validate the result
-        expect(result.RESULT).to.not.equal(true);
+        expect(result.TYPE).to.not.equal(true);
     });
 
     //> Test case : 5
@@ -93,6 +93,11 @@ describe('AX_01', function() {
 
         //validate the result
         expect(result.RESULT).to.not.equal(true);
+    });
+
+    //> Test case : 6
+    it('should not be a global rule', function(){
+        expect(AX_01.isGlobal).to.equal(false);
     });
 
 });
