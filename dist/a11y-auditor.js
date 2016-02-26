@@ -2,6 +2,9 @@
 //defining a global root dirname to save the trouble from relative paths
 //global.__base = __dirname + '/';
 
+/* globals window */
+'use strict';
+
 // load the audit runner and export it
 var auditInitializer = require('./lib/audit/auditInitializer');
 
@@ -24,6 +27,9 @@ var rulesExecutor = require('../rulesProcessor/rulesExecutor');
 var auditRulesCreator = require('../rulesProcessor/auditRulesCreator');
 var auditRunner = require('./auditRunner');
 var auditRunnerHelper = require('./auditRunnerHelper');
+
+//> declaring the variables beforehand - jshint ;)
+var _initializer, _delegatedValidator, _initiateAudit, _preProcessRulesConfig;
 
 
 //> at this point the rulesExecutor has the array of rules implementations and the auditRulesCreator is also available
@@ -61,17 +67,19 @@ module.exports = function auditRunner(selector, rulesConfig, auditConfig) {
 
 
 //> function that is run at the call of every invocation of the auditRunner
-var _initializer = function _initializer(rulesConfig, auditConfig){
+_initializer = function _initializer(rulesConfig, auditConfig){
   //> for every invocation of the auditor, the result object has to be unique. No aggregation of results
   _resultObj = {}, _selectorObjs = {}, _selectorRules = {},
   _hasCompliance = false, _rulesConfig = rulesConfig,
-  _auditConfig = auditConfig, _mustRunGlobalRules = false;
+  _auditConfig = auditConfig,
+  /*jshint -W030 */
+  _mustRunGlobalRules = false;
 };
 
 
 
 //> function that validates the input parameters
-var _delegatedValidator = function _delegatedValidator(selector){
+_delegatedValidator = function _delegatedValidator(selector){
 
   //if selector is null / empty or if its undefined
   if (_.isEmpty(selector) && _.isUndefined(selector)) {
@@ -104,7 +112,7 @@ var _delegatedValidator = function _delegatedValidator(selector){
 
 
 //> This function actually begins the process of conducting the audit
-var _initiateAudit = function _initiateAudit(selector){
+_initiateAudit = function _initiateAudit(selector){
 
   //> if _rulesConfig is not null / empty & not undefined
   if (!_.isEmpty(_rulesConfig) && !_.isUndefined(_rulesConfig)) {
@@ -122,12 +130,12 @@ var _initiateAudit = function _initiateAudit(selector){
   if (!_.isUndefined(_auditConfig) && _.isObject(_auditConfig)) {
 
       //> check if a compliance exists and if its a proper string
-      if(_.has(_auditConfig, 'compliance') && _.isString(_auditConfig['compliance'])){
+      if(_.has(_auditConfig, 'compliance') && _.isString(_auditConfig.compliance)){
         _hasCompliance = true;
       }
 
       //> check if the key to execute global rules exists & if its a proper boolean
-      if(_.has(_auditConfig, 'executeGlobalRules') && _.isBoolean(_auditConfig['executeGlobalRules'])){
+      if(_.has(_auditConfig, 'executeGlobalRules') && _.isBoolean(_auditConfig.executeGlobalRules)){
         _mustRunGlobalRules = _auditConfig.executeGlobalRules;
       }
   }
@@ -151,23 +159,25 @@ var _initiateAudit = function _initiateAudit(selector){
 //> 1) a list of objects extracted from the selectors mentioned in the config object.
 //> 2) A second map that contains the list of rules
 //> The keys for both the maps are the same -> object.toString() + Random Alphanumeric
-var _preProcessRulesConfig = function _preProcessRulesConfig() {
+_preProcessRulesConfig = function _preProcessRulesConfig() {
     var _obj, _ct, _rand;
     //> the config is a 'selector' -> ['array of rules to be skipped']
     for (var currentSelector in _rulesConfig) {
-        //> get the array of corresponding objects
-        _obj = $(currentSelector).get();
-        //> go ahead only when there is an object corresponding to the selector
-        if (_obj.length > 0) {
-            //> non-breaking for loop as it needs to process all the objects
-            for (_ct = 0; _ct < _obj.length; _ct++) {
-                //> generate a UID
-                _rand = auditRunnerHelper.UIDGenerator(10, '0123456789abcdefghijkLMNOPQRSTUVWXYZ');
-                //> map the array of objects
-                _selectorObjs[_obj[_ct].toString() + _rand] = _obj[_ct];
-                //> map the array of rules
-                _selectorRules[_obj[_ct].toString() + _rand] = _rulesConfig[currentSelector];
-            }
+        if(_rulesConfig.hasOwnProperty(currentSelector)){
+          //> get the array of corresponding objects
+          _obj = $(currentSelector).get();
+          //> go ahead only when there is an object corresponding to the selector
+          if (_obj.length > 0) {
+              //> non-breaking for loop as it needs to process all the objects
+              for (_ct = 0; _ct < _obj.length; _ct++) {
+                  //> generate a UID
+                  _rand = auditRunnerHelper.UIDGenerator(10, '0123456789abcdefghijkLMNOPQRSTUVWXYZ');
+                  //> map the array of objects
+                  _selectorObjs[_obj[_ct].toString() + _rand] = _obj[_ct];
+                  //> map the array of rules
+                  _selectorRules[_obj[_ct].toString() + _rand] = _rulesConfig[currentSelector];
+              }
+          }
         }
     }
 };
@@ -181,8 +191,6 @@ var _ = require('lodash/core');
 
 //> modules required from within the app
 var auditRunnerHelper = require('./auditRunnerHelper');
-var enums = require('../enums/enums');
-var axsUtils = require('../axs/axsUtils');
 var auditRulesCreator = require('../rulesProcessor/auditRulesCreator');
 var ruleTagNameMapper = require('../mapper/ruleTagNameMapper');
 var ruleHandlerMapper = require('../mapper/ruleHandlerMapper');
@@ -198,6 +206,8 @@ var _resultObj = {}, // returns the results of the audit run
     _rulesConfig = {}, // Rules Config object that contains some rules to be ignored or skipped for some selectors
     _auditConfig = {}; // Audit Config object contains audit specific configurations like compliance, global rules
 
+//> defining variables before using - jshint ;)
+var _executeGlobalRuleAudits, _conductAudit, _processHTMLObj, _isSkipRule, _populateErrors;
 
 //> exported function which is consumed by the auditInitializer
 module.exports = function(auditObj){
@@ -222,15 +232,16 @@ module.exports = function(auditObj){
   //> return the results object
   return _resultObj;
 
-}
+};
 
 
 
 //> function to run global rules
-var _executeGlobalRuleAudits = function _executeGlobalRuleAudits() {
+_executeGlobalRuleAudits = function _executeGlobalRuleAudits() {
     var _globalRules, _handler, _result;
 
     //> either execute all Global rules or execute only those Global rules falling under the compliance
+    /*jshint -W030 */
     _hasCompliance ? (_globalRules = auditRulesCreator.getAllGlobalRulesByCompliance(_auditConfig.compliance)) : (_globalRules = auditRulesCreator.getAllGlobalRules());
 
     if (!_.isEmpty(_globalRules)) {
@@ -250,7 +261,7 @@ var _executeGlobalRuleAudits = function _executeGlobalRuleAudits() {
 
 
 //> recursively conducts the audit over the array of selectors and children
-var _conductAudit = function _conductAudit(selectorArr) {
+_conductAudit = function _conductAudit(selectorArr) {
     var _count = 0;
     //iterate over the selectorArr and process every selector and its child
     while (_count < selectorArr.length) {
@@ -268,7 +279,7 @@ var _conductAudit = function _conductAudit(selectorArr) {
 
 
 //> process every individual selector from the selector Array
-var _processHTMLObj = function _processHTMLObj(elem) {
+_processHTMLObj = function _processHTMLObj(elem) {
     var _rulesArr, _fn, _result, _ruleObj;
     //get the array of rules corresponding to the tagName to execute (tagName <->['Rule1', 'Rule2'])
     _rulesArr = ruleTagNameMapper.getTagHandlers(elem.tagName);
@@ -297,7 +308,7 @@ var _processHTMLObj = function _processHTMLObj(elem) {
 
 
 //> check if the rule execution must be skipped based on presence of rules against selector in config object
-var _isSkipRule = function _isSkipRule(rule, elem) {
+_isSkipRule = function _isSkipRule(rule, elem) {
     var _ruleList, _ct, _isSkip = false;
     //> iterate over the list of objects in the _selectorObjs which was populated from the config
     for (var _obj in _selectorObjs) {
@@ -320,7 +331,7 @@ var _isSkipRule = function _isSkipRule(rule, elem) {
 
 
 //> This one console.logs the error info for the rule and the element for which it failed
-var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
+_populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
     var _key = (!_.isEmpty(element)) ? (_.isEmpty(element.id) ? element.tagName : element.id) : ruleInfoObj.ruleID;
     _resultObj[_key] = _resultObj[_key] || [];
     _resultObj[_key].push({
@@ -335,12 +346,16 @@ var _populateErrors = function _populateErrors(ruleInfoObj, element, errorObj) {
     });
 };
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"../mapper/ruleHandlerMapper":10,"../mapper/ruleTagNameMapper":11,"../rulesProcessor/auditRulesCreator":47,"../utils/injectDeps":50,"./auditRunnerHelper":4,"jquery":51,"lodash/core":52}],4:[function(require,module,exports){
+},{"../mapper/ruleHandlerMapper":10,"../mapper/ruleTagNameMapper":11,"../rulesProcessor/auditRulesCreator":47,"../utils/injectDeps":50,"./auditRunnerHelper":4,"jquery":51,"lodash/core":52}],4:[function(require,module,exports){
+/* globals Node, HTMLElement */
+'use strict';
+
 module.exports = {
 
   //> check if the current rule that is being processed is compliant
   isCompliant : function(_hasCompliance, ruleObj, _auditConfig){
     var _isCompliant = false;
+    /*jshint -W030 */
     _hasCompliance ? _isCompliant = (ruleObj.compliance === _auditConfig.compliance) : _isCompliant = true;
     return _isCompliant;
   },
@@ -369,9 +384,10 @@ module.exports = {
       }
       return result;
   }
-}
+};
 
 },{}],5:[function(require,module,exports){
+// jshint ignore: start
 /***************************************************************************************
  * dependency injection for rules creation
  * @param
@@ -974,8 +990,11 @@ module.exports = {
     }
 
 };
+// jshint ignore: end
 
 },{"../enums/enums":9}],6:[function(require,module,exports){
+'use strict';
+
 var _validArriaAttributesArr = [
     "aria-activedescendant",
     "aria-atomic",
@@ -1017,6 +1036,8 @@ var _validArriaAttributesArr = [
 module.exports = _validArriaAttributesArr;
 
 },{}],7:[function(require,module,exports){
+'use strict';
+
 var _tagNamesArr = [
     "A",
     "ABBR",
@@ -1114,6 +1135,8 @@ var _tagNamesArr = [
 module.exports = _tagNamesArr;
 
 },{}],8:[function(require,module,exports){
+'use strict';
+
 var _validRoleArr = [
     "alert",
     "alertdialog",
@@ -1193,6 +1216,8 @@ var _validRoleArr = [
 module.exports = _validRoleArr;
 
 },{}],9:[function(require,module,exports){
+'use strict';
+
 //> @imports
 var enumCreator = require("../utils/enumCreator");
 
@@ -2863,11 +2888,14 @@ _enums.TagAndSemanticInfoEnum = enumCreator({
 module.exports = _enums;
 
 },{"../utils/enumCreator":49}],10:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * build the auditRules util that exposes method to add rules. This is a ruleID <-> handler mapper
  * @param
  * @return an object with 3 exposed functions
  **/
+
 var _ruleHandlersList = {}; //> is an Object containing auditRules & handlers
 
 //> This function provides an interface to create the rule
@@ -2889,9 +2917,11 @@ module.exports = {
     addRuleHandler: _addHandlerForRule,
     getRuleHandlersList: _getRuleHandlersList,
     getHandler: _getHandler
-}
+};
 
 },{}],11:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * This is a mapper function that maps a TAG to an array of Rules that need to be run on it
  * @param globalContext of the environment
@@ -2925,9 +2955,11 @@ module.exports = {
     addRuleToTag: _addRuleToTag,
     getRuleTagHandlers: _getRuleTagHandlers,
     getTagHandlers: _getTagHandlers
-}
+};
 
 },{}],12:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Images should have an alt attribute, unless they have an ARIA role of "presentation"
@@ -2937,14 +2969,13 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
 
     var _severityEnum = enums.severityEnum;
 
     //> even input type image needs an alt attribute to be present
-    if ((elem.tagName == "IMG") || (elem.tagName === "INPUT" && $(elem).attr("type") === "image")) {
+    if ((elem.tagName === "IMG") || (elem.tagName === "INPUT" && $(elem).attr("type") === "image")) {
         //first check if it has an ALT attribute, else check if it has a ROLE attribute
         if (elem.hasAttribute("alt")) {
             if (_.isEmpty(elem.getAttribute("alt"))) {
@@ -2992,9 +3023,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],13:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],13:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Positive values for TABINDEX must be avoided
@@ -3002,9 +3035,7 @@ module.exports = {
  **/
 
 var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
 
@@ -3047,19 +3078,18 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],14:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51}],14:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Check for if the current Element has an invalid ARIA attribute
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 var ariaAttributesArray = require("../constants/ariaAttributesArray");
 
 function _ruleExector(elem) {
@@ -3073,7 +3103,6 @@ function _ruleExector(elem) {
     //> iterate over the attributes array of the element and check if any aria-* exists
     [].forEach.call(elem.attributes, function(attr) {
         if (/^aria-/.test(attr.name)) {
-            attr.name = "".toLowerCase(attr.name);
             _data.push(attr.name);
         }
     });
@@ -3122,9 +3151,11 @@ module.exports = {
     tagName: ["*"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../constants/ariaAttributesArray":6,"../enums/enums":9,"jquery":51,"lodash/core":52}],15:[function(require,module,exports){
+},{"../constants/ariaAttributesArray":6,"../enums/enums":9}],15:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Check if element ID is unique
@@ -3134,9 +3165,9 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
+
     var _severityEnum = enums.severityEnum,
         _id;
 
@@ -3146,17 +3177,18 @@ function _ruleExector(elem) {
 
     //check if its unique
     if (!_.isEmpty(_id) && _id !== "") {
-        if ($('*#' + _id).get().length === 1) {
+        var ids = $('[id="'+_id+'"]');
+        if (ids.length > 1 && ids[0] === elem) {
+          return {
+              TYPE: _severityEnum.ERROR,
+              RESULT: false,
+              MSG: "Failed! The Id " + _id + " is used in more than one element"
+          };
+        } else {
             return {
                 TYPE: _severityEnum.INFO,
                 RESULT: true,
                 MSG: "Passed!"
-            };
-        } else {
-            return {
-                TYPE: _severityEnum.ERROR,
-                RESULT: false,
-                MSG: "Failed! The Id " + _id + " is used in more than one element"
             };
         }
     }
@@ -3174,9 +3206,11 @@ module.exports = {
     tagName: ["*"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],16:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],16:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : An element's ID must not be present in more that one aria-owns attribute at any time
@@ -3186,7 +3220,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3236,9 +3269,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],17:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],17:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Any ID referred to via an IDREF must be unique in the DOM
@@ -3248,7 +3283,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3290,9 +3324,11 @@ module.exports = {
     tagName: ["*"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],18:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],18:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : The webpage should have a title that describes topic or purpose which should not be empty
@@ -3302,11 +3338,11 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+function _ruleExector() {
+
     var _severityEnum = enums.severityEnum,
-        _objArr, _title = $("title");
+        _title = $("title");
 
     if (_title.length === 1 && !_.isEmpty(_title.html())) {
         if (_title.html().length > 15 && _title.html().length < 55) {
@@ -3338,9 +3374,11 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],19:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],19:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Provide summaries for tables
@@ -3350,7 +3388,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3379,9 +3416,11 @@ module.exports = {
     tagName: ["TABLE"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],20:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],20:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : Provide abbreviations for header labels
@@ -3392,7 +3431,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3421,9 +3459,11 @@ module.exports = {
     tagName: ["TH"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],21:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],21:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Provide a caption via the CAPTION element. A table CAPTION describes the table in one to three sentences"
@@ -3433,7 +3473,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3472,9 +3511,11 @@ module.exports = {
     tagName: ["TABLE"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],22:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],22:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Elements with ARIA roles must use a valid, non-abstract ARIA role."
@@ -3485,7 +3526,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 var validRoleArr = require("../constants/validAriaRolesArr");
 
 function _ruleExector(elem) {
@@ -3560,9 +3600,11 @@ module.exports = {
     tagName: ["*"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../constants/validAriaRolesArr":8,"../enums/enums":9,"jquery":51,"lodash/core":52}],23:[function(require,module,exports){
+},{"../constants/validAriaRolesArr":8,"../enums/enums":9,"jquery":51,"lodash/core":52}],23:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "The web page should have the content's human language indicated in the markup. Identify the primary natural
@@ -3574,9 +3616,8 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+function _ruleExector() {
     var _severityEnum = enums.severityEnum,
         _html = $("html");
 
@@ -3603,9 +3644,11 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],24:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],24:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "There should be only one main element for a web page document"
@@ -3613,15 +3656,13 @@ module.exports = {
  **/
 
 var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+function _ruleExector() {
     var _severityEnum = enums.severityEnum;
 
     //> There is neither one main element nor one element with role as main
-    if ($("[role='main']").length == 1 && $("main").length == 1 && $("[role='main']")[0] === $("main")[0]) {
+    if ($("[role='main']").length === 1 && $("main").length === 1 && $("[role='main']")[0] === $("main")[0]) {
         return {
             TYPE: _severityEnum.INFO,
             RESULT: true,
@@ -3644,9 +3685,11 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],25:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51}],25:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Prsence of Title attribute for ABBR, ACRONYM and A. Specify the expansion of each abbreviation or acronym in
@@ -3654,10 +3697,8 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3694,19 +3735,24 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],26:[function(require,module,exports){
+},{"../enums/enums":9,"lodash/core":52}],26:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "This element does not support ARIA roles, states and properties"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
 var axsUtils = require("../axs/axsUtils");
+
+//> check if this can take aria attributes
+function _canTakeAriaAttributes(elem) {
+    return (elem = axsUtils.checkForAria(elem)) ? !elem.reserved : !false;
+}
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3735,11 +3781,6 @@ function _ruleExector(elem) {
     }
 }
 
-//> check if this can take aria attributes
-function _canTakeAriaAttributes(elem) {
-    return (elem = axsUtils.checkForAria(elem)) ? !elem.reserved : !false;
-}
-
 module.exports = {
     name: "isAriaOnReservedElement",
     description: "This element does not support ARIA roles, states and properties",
@@ -3747,61 +3788,71 @@ module.exports = {
     tagName: ["*"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],27:[function(require,module,exports){
+},{"../axs/axsUtils":5,"../enums/enums":9}],27:[function(require,module,exports){
+/* globals document */
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Avoid Deprecated features of W3C technologies"
+ * Deprecated elements are "FONT", "BASEFONT", "APPLET", "CENTER", "DIR", "ISINDEX", "MENU", "S", "STRIKE", "U"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
-    var _severityEnum = enums.severityEnum;
+function _ruleExector() {
+    var _severityEnum = enums.severityEnum,
+        font = document.getElementsByTagName('FONT').length,
+        basefont = document.getElementsByTagName('BASEFONT').length,
+        applet = document.getElementsByTagName('APPLET').length,
+        center = document.getElementsByTagName('CENTER').length,
+        dir = document.getElementsByTagName('DIR').length,
+        isindex = document.getElementsByTagName('ISINDEX').length,
+        menu = document.getElementsByTagName('MENU').length,
+        s = document.getElementsByTagName('S').length,
+        strike = document.getElementsByTagName('STRIKE').length,
+        underline = document.getElementsByTagName('U').length;
 
-    return {
-        TYPE: _severityEnum.ERROR,
-        RESULT: false,
-        MSG: "Failed! There are Deprecated elements being used which are not part of W3C technologies"
-    };
+    var hasDeprecatedElems = (font > 0 || basefont > 0 || applet > 0 || center > 0 || dir > 0 || isindex > 0 || menu > 0 || s > 0 || strike > 0 || underline > 0);
+
+    if(hasDeprecatedElems){
+      return {
+          TYPE: _severityEnum.ERROR,
+          RESULT: false,
+          MSG: "Failed! There are Deprecated elements being used which are not part of W3C technologies"
+      };
+    }else{
+      return {
+          TYPE: _severityEnum.INFO,
+          RESULT: true,
+          MSG: "Passed! There are NO Deprecated elements being used"
+      };
+    }
+
 }
 
 module.exports = {
     name: "isDeprecatedElement",
     description: "Avoid Deprecated features of W3C technologies",
     ruleID: "AX_16",
-    tagName: [
-        "FONT",
-        "BASEFONT",
-        "APPLET",
-        "CENTER",
-        "DIR",
-        "ISINDEX",
-        "MENU",
-        "S",
-        "STRIKE",
-        "U"
-    ],
+    tagName: [],
     handler: _ruleExector,
-    isGlobal: false
-}
+    isGlobal: true
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],28:[function(require,module,exports){
+},{"../enums/enums":9}],28:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Avoid using the style attribute and defining styles inline and move them to stylesheets instead"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3828,9 +3879,11 @@ module.exports = {
     tagName: ["*"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],29:[function(require,module,exports){
+},{"../enums/enums":9}],29:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Until user agents handle empty controls correctly, include default placeholding characters in edit boxes and
@@ -3841,7 +3894,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -3879,9 +3931,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],30:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],30:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Associate labels explicitly with their controls"
@@ -3891,7 +3945,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3903,7 +3956,7 @@ function _ruleExector(elem) {
         _labelObj = $("label[for=" + _id + "]");
 
         //if label text is non-empty and there is only one label element defined
-        if (_labelObj.length == 1 && !_.isEmpty(_labelObj.html())) {
+        if (_labelObj.length === 1 && !_.isEmpty(_labelObj.html())) {
             return {
                 TYPE: _severityEnum.INFO,
                 RESULT: true,
@@ -3940,9 +3993,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],31:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],31:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Until user agents provide the ability to stop the refresh, do not create periodically auto-refreshing / auto
@@ -3953,7 +4008,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -3982,9 +4036,11 @@ module.exports = {
     tagName: ["META"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],32:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],32:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Until user agents allow users to turn off spawned windows, do not cause pop-ups or other windows to appear
@@ -3995,7 +4051,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -4027,9 +4082,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],33:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],33:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Ensure that pages are usable when scripts, applets, or other programmatic objects are turned off or not
@@ -4038,11 +4095,9 @@ module.exports = {
  **/
 
 var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+function _ruleExector() {
     var _severityEnum = enums.severityEnum;
 
     //> checks for presence of NOSCRIPT tags
@@ -4068,9 +4123,11 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],34:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51}],34:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Provide keyboard shortcuts to important links (including those in client-side image maps), form controls,
@@ -4078,10 +4135,8 @@ module.exports = {
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -4117,9 +4172,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],35:[function(require,module,exports){
+},{"../enums/enums":9,"lodash/core":52}],35:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check if there is atleast one header section / element for the page content that defines its purpose &
@@ -4130,14 +4187,13 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+function _ruleExector() {
     var _severityEnum = enums.severityEnum,
         _innerHTML, _innerTags, _prevAll;
 
     //a proper mark up defines one heading / purpose for the page & multiple sub-headings / sections / paragraphs
-    if ($("h1").length == 1 && !_.isEmpty($("h1").html())) {
+    if ($("h1").length === 1 && !_.isEmpty($("h1").html())) {
         _innerHTML = $("h1").html();
         _innerTags = $("h1").find("p, span, div, b, i, u, a, section, article, aside, ul, li, ol, h2, h3, h4, h5, h6");
         _prevAll = $("h1").prevAll().filter("h2, h3, h4, h5, h6");
@@ -4145,7 +4201,7 @@ function _ruleExector(elem) {
         //check if the text length of > 15 but < 100
         if ((_innerHTML.length > 15) && (_innerHTML.length < 100)) {
             //check if there are no other tags defined in it and no other header tags defined out of order
-            if ((_innerTags.length == 0) && (_prevAll.length == 0)) {
+            if ((_innerTags.length === 0) && (_prevAll.length === 0)) {
                 return {
                     TYPE: _severityEnum.WARN,
                     RESULT: false,
@@ -4181,16 +4237,17 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],36:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],36:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "role=main must be present on significant elements only"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
-var $ = require("jquery");
-var _ = require('lodash/core');
+
 var enums = require("../enums/enums");
 var axsUtils = require("../axs/axsUtils");
 
@@ -4239,9 +4296,11 @@ module.exports = {
     tagName: ["*"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],37:[function(require,module,exports){
+},{"../axs/axsUtils":5,"../enums/enums":9}],37:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Avoid using the style attribute and defining styles inline and move them to stylesheets instead"
@@ -4250,9 +4309,14 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+
+//> check if the input param object is empty
+function _checkIfIsEmpty(obj) {
+    return _.isEmpty(obj);
+}
+
+function _ruleExector() {
     var _severityEnum = enums.severityEnum,
         _description = $("meta[name='description']"),
         _author = $("meta[name='author']"),
@@ -4279,11 +4343,6 @@ function _ruleExector(elem) {
     }
 }
 
-//> check if the input param object is empty
-function _checkIfIsEmpty(obj) {
-    return _.isEmpty(obj);
-}
-
 module.exports = {
     name: "hasRequiredMetaAttributes",
     description: "Check if there is a meta tag with charset, keywords, description, author, copyright attributes defined",
@@ -4291,9 +4350,11 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],38:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],38:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check if there is a link that helps skip irrelevant information and land the user at the main content"
@@ -4302,9 +4363,8 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+function _ruleExector() {
     var _severityEnum = enums.severityEnum,
         _mainElem = $("main"),
         _mainRole = $("[role='main']"),
@@ -4343,9 +4403,11 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],39:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],39:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check if PRE elements are used. Ensure that there are no TABLE based layouts in it"
@@ -4355,7 +4417,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -4382,19 +4443,18 @@ module.exports = {
     tagName: ["PRE"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],40:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],40:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Don't use the <B> and <I> tags. They are used to create a visual presentation effect"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -4424,9 +4484,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],41:[function(require,module,exports){
+},{"../enums/enums":9}],41:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Provide text equivalent for every non-text element like OBJECT"
@@ -4434,9 +4496,7 @@ module.exports = {
  **/
 
 var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum;
@@ -4463,9 +4523,12 @@ module.exports = {
     tagName: ["OBJECT"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],42:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51}],42:[function(require,module,exports){
+/* globals document */
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Ensure that equivalents for dynamic content are updated when the dynamic content changes. As the contents of
@@ -4473,10 +4536,9 @@ module.exports = {
  * Thus, content developers should always make the source ('src') of a frame an HTML file"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
-var $ = require("jquery");
+
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
 
@@ -4525,9 +4587,11 @@ module.exports = {
     tagName: ["IFRAME"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],43:[function(require,module,exports){
+},{"../enums/enums":9,"lodash/core":52}],43:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Use FIELDSET to group form controls into semantic units and describe the group with the LEGEND element."
@@ -4535,15 +4599,13 @@ module.exports = {
  **/
 
 var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
-        _fieldset, elem = $(elem);
-    _fieldset = $(elem).closest("fieldset").first();
-    if (_fieldset.has(elem).length) {
+        _fieldset, $elem = $(elem);
+    _fieldset = $elem.closest("fieldset").first();
+    if (_fieldset.has($elem).length) {
         return {
             TYPE: _severityEnum.WARN,
             RESULT: false,
@@ -4574,9 +4636,11 @@ module.exports = {
     ],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],44:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51}],44:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Use FIELDSET to group form controls into semantic units and describe the group with the LEGEND element."
@@ -4584,15 +4648,13 @@ module.exports = {
  **/
 
 var $ = require("jquery");
-var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
-        elem = $(elem);
+        $elem = $(elem);
 
-    if (elem.has("legend").length) {
+    if ($elem.has("legend").length) {
         return {
             TYPE: _severityEnum.WARN,
             RESULT: false,
@@ -4615,21 +4677,22 @@ module.exports = {
     tagName: ["FIELDSET"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],45:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51}],45:[function(require,module,exports){
+/* globals document */
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Check for presence of a DOCTYPE"
  * @return Rule Info object with Rule ID, Info, ErrMsg, Tags, Handler
  **/
 
-var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
-function _ruleExector(elem) {
+function _ruleExector() {
     var _severityEnum = enums.severityEnum,
         _node, _htmlDocType;
 
@@ -4664,9 +4727,11 @@ module.exports = {
     tagName: [],
     handler: _ruleExector,
     isGlobal: true
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],46:[function(require,module,exports){
+},{"../enums/enums":9,"lodash/core":52}],46:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * Add to the list of Audit Rules
  * Rule : "Table TD tags are associated to corresponding TH header tags of the table via the headers attribute"
@@ -4675,7 +4740,6 @@ module.exports = {
 var $ = require("jquery");
 var _ = require('lodash/core');
 var enums = require("../enums/enums");
-var axsUtils = require("../axs/axsUtils");
 
 function _ruleExector(elem) {
     var _severityEnum = enums.severityEnum,
@@ -4713,9 +4777,11 @@ module.exports = {
     tagName: ["TD"],
     handler: _ruleExector,
     isGlobal: false
-}
+};
 
-},{"../axs/axsUtils":5,"../enums/enums":9,"jquery":51,"lodash/core":52}],47:[function(require,module,exports){
+},{"../enums/enums":9,"jquery":51,"lodash/core":52}],47:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * build the auditRules util that exposes method to add rules. This is a ruleID <-> RuleInfoObj mapper
  * @param
@@ -4737,10 +4803,11 @@ function _createRule(_obj) {
     _auditRules[_obj.ruleID] = _obj;
     _tagNamesArr = _obj.tagName;
     //todo add a default * to make a rule appear for all TAGS
-    if (_tagNamesArr.length == 1 && _tagNamesArr[0] === "*") {
+    if (_tagNamesArr.length === 1 && _tagNamesArr[0] === "*") {
         _tagNamesArr = tagNamesArr;
     }
-    _tagNamesArr.forEach(function(element, index, array) {
+    //forEach args includes element,index,array
+    _tagNamesArr.forEach(function(element) {
         ruleTagNameMapper.addRuleToTag(element, _obj.ruleID);
     });
     ruleHandlerMapper.addRuleHandler(_obj.ruleID, _obj.handler);
@@ -4753,7 +4820,7 @@ function _getAuditRules() {
 
 //> get All the global rules that needs to be executed once
 function _getAllGlobalRules() {
-    var _globalRules = {}
+    var _globalRules = {};
     _.forEach(_auditRules, function(value, key) {
         if (value.isGlobal) {
             _globalRules[key] = value;
@@ -4785,9 +4852,11 @@ module.exports = {
     getRuleObj: _getRule,
     getAllGlobalRules: _getAllGlobalRules,
     getAllGlobalRulesByCompliance : _getAllGlobalRulesByCompliance
-}
+};
 
 },{"../constants/tagNamesArray":7,"../mapper/ruleHandlerMapper":10,"../mapper/ruleTagNameMapper":11,"lodash/core":52}],48:[function(require,module,exports){
+'use strict';
+
 //> array that holds all the rules
 var _rulesArr = [];
 
@@ -4831,6 +4900,8 @@ _rulesArr.push(require("../rulesImpl/AX_35"));
 module.exports = _rulesArr;
 
 },{"../rulesImpl/AX_01":12,"../rulesImpl/AX_02":13,"../rulesImpl/AX_03":14,"../rulesImpl/AX_04":15,"../rulesImpl/AX_05":16,"../rulesImpl/AX_06":17,"../rulesImpl/AX_07":18,"../rulesImpl/AX_08":19,"../rulesImpl/AX_09":20,"../rulesImpl/AX_10":21,"../rulesImpl/AX_11":22,"../rulesImpl/AX_12":23,"../rulesImpl/AX_13":24,"../rulesImpl/AX_14":25,"../rulesImpl/AX_15":26,"../rulesImpl/AX_16":27,"../rulesImpl/AX_17":28,"../rulesImpl/AX_18":29,"../rulesImpl/AX_19":30,"../rulesImpl/AX_20":31,"../rulesImpl/AX_21":32,"../rulesImpl/AX_22":33,"../rulesImpl/AX_23":34,"../rulesImpl/AX_24":35,"../rulesImpl/AX_25":36,"../rulesImpl/AX_26":37,"../rulesImpl/AX_27":38,"../rulesImpl/AX_28":39,"../rulesImpl/AX_29":40,"../rulesImpl/AX_30":41,"../rulesImpl/AX_31":42,"../rulesImpl/AX_32":43,"../rulesImpl/AX_33":44,"../rulesImpl/AX_34":45,"../rulesImpl/AX_35":46}],49:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * This is a simple immutable enumCreator
  * @param obj that needs to be made as an Enum
@@ -4858,6 +4929,8 @@ Object.freeze(EnumGen.prototype);
 module.exports = EnumGen; //> return the enum constructor
 
 },{}],50:[function(require,module,exports){
+'use strict';
+
 /***************************************************************************************
  * dependency injection for rules creation
  * @param
@@ -4869,9 +4942,9 @@ module.exports = {
 
     process: function(target) {
         var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
-        var FN_ARG_SPLIT = /,/;
-        var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
-        var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        //var FN_ARG_SPLIT = /,/;
+        //var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+        //var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
         var text = target.toString();
         var args = text.match(FN_ARGS)[1].split(',');
 
