@@ -73,11 +73,11 @@ var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
 
 1. htmlSelector - A valid HTML selector (eg. 'button')
 2. rulesConfig - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
-3. auditConfig - A Boolean to indicate whether global rules that audit the whole document need to be ignored.
+3. auditConfig - A config obj for the a11y-auditor that governs compliance, global rules execution etc.,
 
 auditConfig takes in 2 properties / keys :
 
-- 'executeGlobalRules': Boolean to indicate whether Global rules need to be executed or not
+- 'executeGlobalRules': A Boolean to indicate whether global rules that audit the whole document need to be ignored.
 - 'compliance' : Takes one of the 3 strings : 'A', 'AA', 'AAA'.
 
 
@@ -121,6 +121,7 @@ module.exports = {
 
 | Directory  | Description |
 | -----------| ------------- |
+| dist/  | The distribution file to use in browser environments |
 | lib/auditRunner  | The engine that recursively iterates & performs the audit & exposes an interface to consume  |
 | lib/constants  | Constants / Enums  |
 | lib/axs  | Utils for certain rules  |
@@ -129,7 +130,7 @@ module.exports = {
 | lib/rulesImpl  | Implementation functions that contain the rule implementation  |
 | lib/rulesProcessor  | Code to pick up rules and add it to the auditRulesCreator  |
 | lib/utils  | Code containing utils for enum creation, DOM object checks and dependency injections  |
-
+| test/  | The test cases written for this project  |
 
 #### Implementation Tests :
 --------------------
