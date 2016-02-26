@@ -79,8 +79,8 @@ var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
 
 auditConfig takes in 2 properties / keys :
 
-- 'executeGlobalRules': A Boolean to indicate whether global rules that audit the whole document need to be ignored.
-- 'compliance' : Takes one of the 3 strings : 'A', 'AA', 'AAA'.
+- *'executeGlobalRules'*: A Boolean to indicate whether global rules that audit the whole document need to be ignored.
+- *'compliance'* : Takes one of the 3 strings : 'A', 'AA', 'AAA'.
 
 
 #### To ignore a few rules :
