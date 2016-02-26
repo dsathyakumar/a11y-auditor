@@ -6,4 +6,4 @@ before_install:
   - "npm install -g grunt-cli"
 
 after_install:
-  - "grunt build"
+  - "grunt test"
