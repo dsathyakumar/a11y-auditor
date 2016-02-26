@@ -127,7 +127,8 @@ module.exports = {
 #### Implementation Tests :
 --------------------
 
-Individual tests for each of the rules implemented have been placed under tests
+Individual tests for each of the rules implemented have been placed under tests. The test cases are built with the help of
+[Mocha](http://mochajs.org) and [Chai](http://chaijs.com) for BDD style assertions. The tests are integrated into the workflow via Grunt. 
 
 
 #### Rule Understanding:
