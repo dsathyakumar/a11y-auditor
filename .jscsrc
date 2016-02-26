@@ -8,5 +8,6 @@
     "requireTrailingComma": null,
     "requireSpacesInsideObjectBrackets": null,
     "requireSpacesInAnonymousFunctionExpression": null,
-    "requireDollarBeforejQueryAssignment": null
+    "requireDollarBeforejQueryAssignment": null,
+    "disallowYodaConditions" : false
 }

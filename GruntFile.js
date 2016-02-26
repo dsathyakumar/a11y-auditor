@@ -141,7 +141,7 @@ module.exports = function(grunt) {
                 dest: 'dist/a11y-auditor.js',
                 options: {
                     browserifyOptions: {
-                        standalone: "a11y-auditor"
+                        standalone: 'a11y-auditor'
                     }
                 }
             }
@@ -156,7 +156,7 @@ module.exports = function(grunt) {
     });
     grunt.registerTask('test', [
         'jshint',
-        //'jscs',
+        'jscs',
         'jsonlint',
         'mochaTest'
     ]);
