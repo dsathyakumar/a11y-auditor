@@ -18,7 +18,7 @@
 
 > **NPM MODULE** of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
 
-> Status : Dev (in progress)
+> **Status** : Dev (in progress)
 
 **Pull requests are welcome!**
 
@@ -73,9 +73,9 @@ var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
 
 ```
 
-1. htmlSelector or DOM object - A valid HTML selector or a DOM object (containing child nodes is also cool) (eg. 'button')
-2. rulesConfig - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
-3. auditConfig - A config obj for the a11y-auditor that governs compliance, global rules execution etc.,
+1. **htmlSelector or DOM object** - A valid HTML selector or a DOM object (containing child nodes is also cool) (eg. 'button')
+2. **rulesConfig** - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
+3. **auditConfig** - A config obj for the a11y-auditor that governs compliance, global rules execution etc.,
 
 auditConfig takes in 2 properties / keys :
 
