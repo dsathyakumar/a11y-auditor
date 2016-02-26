@@ -157,7 +157,7 @@ module.exports = function(grunt) {
     grunt.registerTask('test', [
         'jshint',
         //'jscs',
-        //'jsonlint',
+        'jsonlint',
         'mochaTest'
     ]);
     grunt.registerTask('build', [
