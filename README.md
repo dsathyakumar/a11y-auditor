@@ -31,7 +31,7 @@ Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA co
 
 #### For Node JS usage :
 ---------------------------------------------------------
-require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function validator()]. Use it in your module.
+require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function validator()]. Use it in your module. But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style assertions via CHAI JS and can be integrated with mocha tests and run on development machines and CI.
 
 ```
 var auditRunner = require('a11y-auditor');
@@ -49,7 +49,12 @@ window.onload = function(){
 		auditRunner(htmlSelector, rulesConfig, auditConfig);
 }
 ```
+But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style assertions via CHAI JS and can be integrated with mocha tests and run on development machines and CI.
 
+
+#### For JAVA projects :
+---------------------------------------------------------
+It is possible to run a grunt workflow via MAVEN builds using the [Front end maven plugin](https://github.com/eirslett/frontend-maven-plugin) and execute test cases built on mocha and chai. The above setup for Node JS holds good here as well. You will have to [integrate your project](https://www.linkedin.com/pulse/node-npm-java-maven-damodaran-sathyakumar) with the Front End Maven Plugin.
 
 
 #### Method definition of method exported by the Module :
@@ -128,7 +133,7 @@ module.exports = {
 --------------------
 
 Individual tests for each of the rules implemented have been placed under tests. The test cases are built with the help of
-[Mocha](http://mochajs.org) and [Chai](http://chaijs.com) for BDD style assertions. The tests are integrated into the workflow via Grunt. 
+[Mocha](http://mochajs.org) and [Chai](http://chaijs.com) for BDD style assertions. The tests are integrated into the workflow via Grunt.
 
 
 #### Rule Understanding:
