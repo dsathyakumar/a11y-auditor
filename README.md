@@ -122,7 +122,7 @@ module.exports = {
 --------------------
 
 | Directory  | Description |
-| -----------| ------------- |
+| :---         | :---       |
 | dist/  | The distribution file to use in browser environments |
 | lib/auditRunner  | The engine that recursively iterates & performs the audit & exposes an interface to consume  |
 | lib/constants  | Constants / Enums  |
