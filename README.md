@@ -6,6 +6,7 @@
 [![DUB](https://img.shields.io/dub/l/vibe-d.svg)]()
 [![Maintenance](https://img.shields.io/maintenance/yes/2016.svg)]()
 [![NPM](https://nodei.co/npm/a11y-auditor.png)](https://nodei.co/npm/a11y-auditor/)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/dsathyakumar/a11y-auditor.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
 
 
 # a11y-auditor
@@ -151,3 +152,8 @@ To know what each rule does, look at the a11y.properties.json file.
 --------------------
 
 jQuery (v 2.2.0), lodash (4.3.0)
+
+
+#### Dev Dependencies :
+--------------------
+Grunt, Mocha, Chai, Browserify, jsdom, istanbul, grunt-watch, jsonlint, jscs, jshint, docco-plus, proxyquire, sinon-chai.
