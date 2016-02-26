@@ -14,6 +14,8 @@
 
 > Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y BDD style accessibility assertions](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests itself. This helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
 
+> Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
+
 > **NPM MODULE** of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
 
 > Status : Dev (in progress)
@@ -71,7 +73,7 @@ var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
 
 ```
 
-1. htmlSelector - A valid HTML selector (eg. 'button')
+1. htmlSelector or DOM object - A valid HTML selector or a DOM object (containing child nodes is also cool) (eg. 'button')
 2. rulesConfig - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
 3. auditConfig - A config obj for the a11y-auditor that governs compliance, global rules execution etc.,
 
