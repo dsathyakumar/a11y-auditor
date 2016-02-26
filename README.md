@@ -12,6 +12,8 @@
 
 > This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
+> Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y BDD style accessibility assertions](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests itself. This helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
+
 > **NPM MODULE** of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
 
 > Status : Dev (in progress)
@@ -21,7 +23,7 @@
 
 #### TIP :
 ---------------------------------------------------------
-Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages as part of your Dev testing (unit tests) itself via the chai-a11y plugin.
+Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages as part of your Dev testing (unit tests) itself via the [chai-a11y](https://github.com/pranavjha/chai-a11y) plugin.
 
 [chai-a11y](https://github.com/pranavjha/chai-a11y) is a chai plugin available as an [npm](https://github.com/pranavjha/chai-a11y) module which consumes a11y-auditor and helps run tests and conduct audits.
 
