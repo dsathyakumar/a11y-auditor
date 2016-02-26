@@ -56,7 +56,7 @@ But its recommended to use a11y-auditor with the chai-a11y plugin that provides 
 
 #### For JAVA projects :
 ---------------------------------------------------------
-It is possible to run a grunt workflow via MAVEN builds using the [Front end maven plugin](https://github.com/eirslett/frontend-maven-plugin) and execute test cases built on mocha and chai. The above setup for Node JS holds good here as well. You will have to [integrate your project](https://www.linkedin.com/pulse/node-npm-java-maven-damodaran-sathyakumar) with the Front End Maven Plugin.
+It is possible to run a grunt workflow via MAVEN builds using the [Front end maven plugin](https://github.com/eirslett/frontend-maven-plugin) and execute test cases built on mocha and chai. The above setup for a11y-auditor & chai-a11y ( mentioned above for Node JS ) holds good here as well, as the Front End Maven plugin downloads and installs a node executable. You will have to [integrate your project](https://www.linkedin.com/pulse/node-npm-java-maven-damodaran-sathyakumar) with the Front End Maven Plugin before attempting to use a11y-auditor for JAVA based projects built on JSP / JSF / Struts.
 
 
 #### Method definition of method exported by the Module :
