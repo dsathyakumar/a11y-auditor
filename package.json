@@ -4,6 +4,10 @@
   "description": "This a11y project is an implementation of accessibility rules as defined in W3C Accessibility Checklist",
   "main": "a11y-auditor.js",
   "author": "dsathyakumar <gautham.daamodhar@gmail.com>",
+  "contributors": [{
+    "name": "Pranav Shekhar Jha",
+    "email": "jha.pranav.s@gmail.com"
+  }],
   "scripts": {
       "test": "grunt test"
   },
