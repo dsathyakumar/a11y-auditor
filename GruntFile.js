@@ -27,7 +27,8 @@ module.exports = function(grunt) {
         clean: [
             '.coverage',
             '.test',
-            '.cache'
+            '.cache',
+            '.docs'
         ],
         jshint: {
             lib: {
@@ -154,15 +155,22 @@ module.exports = function(grunt) {
             tasks: ['default']
         }
     });
+    //register the grunt task for mocha tests on Jsdom
     grunt.registerTask('test', [
-        'jshint',
-        'jscs',
-        'jsonlint',
+        'lint',
         'mochaTest'
     ]);
+    //register the grunt task for linting
+    grunt.registerTask('lint', [
+        'jshint',
+        'jscs',
+        'jsonlint'
+    ]);
+    //register the grunt task for browserify bundler
     grunt.registerTask('build', [
         'browserify'
     ]);
+    //register the grunt task for coverage
     grunt.registerTask('coverage', [
         'instrument',
         'env:coverage',
@@ -171,10 +179,11 @@ module.exports = function(grunt) {
         'makeReport',
         'coveralls:lcov'
     ]);
+    //register the grunt task for documentation
     grunt.registerTask('document', [
         'docco-plus'
     ]);
-    //register the grunt tasks that need to be executed
+    //register the default grunt tasks that need to be executed
     grunt.registerTask('default', [
         'test',
         'build',

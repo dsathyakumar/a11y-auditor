@@ -30,15 +30,13 @@
 ---------------------------------------------------------
 Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages as part of your Dev testing (unit tests) itself via the [chai-a11y](https://github.com/pranavjha/chai-a11y) plugin.
 
-[chai-a11y](https://github.com/pranavjha/chai-a11y) is a chai plugin available as an [npm](https://github.com/pranavjha/chai-a11y) module which consumes a11y-auditor and helps run tests and conduct audits.
-
-[chai-a11y](https://github.com/pranavjha/chai-a11y) helps to run a11y-auditor on a headless phantomJS instance (AMD, common JS style) and also via script tag loading.
+[chai-a11y](https://github.com/pranavjha/chai-a11y) is a chai plugin available as an [npm](https://www.npmjs.com/package/chai-a11y) module which consumes a11y-auditor, provides a `to.be.accessible()` interface for asserting a11y audits, and helps run tests, conduct audits on a headless phantomJS instance (supporting all flavors of javascript :- AMD, common JS style and also via script tag loading.)
 
 
 
 #### For Node JS usage :
 ---------------------------------------------------------
-require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function validator()]. Use it in your module. But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style assertions via CHAI JS and can be integrated with mocha tests and run on development machines and CI.
+require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function ()]. Use it in your module. But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style assertions via chai js and can be integrated with mocha tests and run on development machines and CI.
 
 ```
 var auditRunner = require('a11y-auditor');
@@ -147,7 +145,43 @@ Individual tests for each of the rules implemented have been placed under tests.
 #### Rule Understanding:
 --------------------
 
-To know what each rule does, look at the a11y.properties.json file.
+The a11y-auditor aims to automate rules defined in the [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html), which contains numerous rules.
+In order to make creation of rules easier, each rule is implemented in a modular fashion in a separate file. To understand what each rule does, look at the a11y.properties.json file.
+
+
+#### Build Tasks
+--------------------
+
+##### `clean` task
+
+This task will clean up the residue directories .test, .coverage, .docs.
+
+
+##### `lint` task
+
+This task runs [jshint](http://jshint.com/), [jsonlint](https://www.npmjs.com/package/grunt-jsonlint),
+[jscs](http://jscs.info/) on the source files.
+
+
+##### `test` task
+
+Runs the above lint task and [mocha](https://mochajs.org) test cases over a sampled DOM via [jsdom](https://github.com/tmpvar/jsdom)
+
+
+##### `coverage` task
+
+Runs [mocha](https://mochajs.org) test cases and collects the coverage reports
+
+
+##### `build` task
+
+Generates the distribution file built via Browserify & also the Documentation and publishes it to the GH pages.
+
+
+##### `document` task
+
+Generates Code Documentation using [docco-plus](https://www.npmjs.com/package/docco-plus)
+
 
 
 #### Dependencies :
