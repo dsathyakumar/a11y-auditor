@@ -5,6 +5,7 @@
 [![npm](https://img.shields.io/npm/v/a11y-auditor.svg)](https://david-dm.org/dsathyakumar/a11y-auditor#info=version)
 [![DUB](https://img.shields.io/dub/l/vibe-d.svg)]()
 [![Maintenance](https://img.shields.io/maintenance/yes/2016.svg)]()
+[![Coverage Status](https://coveralls.io/repos/github/dsathyakumar/a11y-auditor/badge.svg?branch=master)](https://coveralls.io/github/dsathyakumar/a11y-auditor?branch=master)
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/dsathyakumar/a11y-auditor.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
 
 
