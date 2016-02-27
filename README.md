@@ -199,3 +199,8 @@ jQuery (v 2.2.0), lodash (4.3.0)
 #### Dev Dependencies :
 --------------------
 Grunt, grunt-mocha-test, Chai, grunt-browserify, jsdom, grunt-istanbul, grunt-contrib-watch, grunt-jsonlint, grunt-jscs, grunt-contrib-jshint, docco-plus, proxyquire, sinon-chai, grunt-contrib-copy, grunt-contrib-clean.
+
+
+#### Ideation & Contributors :
+--------------------
+[@pranavjha](https://github.com/pranavjha/)
