@@ -1,3 +1,6 @@
+# a11y-auditor
+
+
 [![Build Status](https://img.shields.io/travis/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://travis-ci.org/dsathyakumar/a11y-auditor)
 [![Dependency Status](https://img.shields.io/david/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor)
 [![devDependency Status](https://img.shields.io/david/dev/dsathyakumar/a11y-auditor.svg?style=flat-square)](https://david-dm.org/dsathyakumar/a11y-auditor#info=devDependencies)
@@ -12,7 +15,6 @@
 [![NPM](https://nodei.co/npm/a11y-auditor.png)](https://nodei.co/npm/a11y-auditor/)
 
 
-# a11y-auditor
 
 > This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
