@@ -20,16 +20,30 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-env');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        clean: [
-            '.coverage',
-            '.test',
-            '.cache',
-            '.docs'
-        ],
+        //grunt-contrib-clean tasks to clean folders on every document, test, coverage tasks
+        clean: {
+            docs: ['.docs', '.cache'],
+            testCoverage: ['.coverage', '.test', '.cache']
+        },
+        //grunt-contrib-copy tasks copies the lib folder and places it inside .coverage/instrument/
+        copy: {
+            main: {
+                files: [
+                  {
+                      expand: true,
+                      flatten: true,
+                      src: ['lib'],
+                      dest: '.coverage/instrument/'
+                  }
+                ]
+            }
+        },
+        // grunt-contrib-jshint tasks runs jshint across files mentioned in src
         jshint: {
             lib: {
                 src: [
@@ -41,6 +55,7 @@ module.exports = function(grunt) {
                 }
             }
         },
+        //grunt-jscs tasks runs tests for code style errors
         jscs: {
             lib: {
                 src: [
@@ -52,6 +67,7 @@ module.exports = function(grunt) {
                 }
             }
         },
+        //grunt-jsonlint tasks runs lint tests across .json files
         jsonlint: {
             lib: {
                 src: [
@@ -60,7 +76,7 @@ module.exports = function(grunt) {
                 ]
             }
         },
-        // Configure a mochaTest task
+        // server side grunt-mocha-test task
         mochaTest: {
             test: {
                 options: {
@@ -72,6 +88,7 @@ module.exports = function(grunt) {
                 ]
             }
         },
+        //grunt-istanbul instrumentor - used to instrument files under .coverage/instrument/lib/*
         instrument: {
             files: [
                 'lib/**/*.js'
@@ -81,24 +98,28 @@ module.exports = function(grunt) {
                 basePath: '.coverage/instrument/'
             }
         },
+        //grunt-istanbul task to store coverage info under .coverage/json/
         storeCoverage: {
             options: {
                 dir: '.coverage/json/'
             }
         },
+        //grunt-istanbul task to make report from .json file into .lcov
         makeReport: {
-            src: '.coverage/json/*.json',
+            src: '.coverage/json/**/*.json',
             options: {
                 type: 'lcov',
                 dir: '.coverage/reports/',
                 print: 'detail'
             }
         },
+        //grunt-env task to store coverage directory
         env: {
             coverage: {
                 APP_DIR_FOR_CODE_COVERAGE: '.coverage/instrument/'
             }
         },
+        //grunt-docco-plus task to generate documentation
         'docco-plus': {
             debug: {
                 src: [
@@ -112,6 +133,7 @@ module.exports = function(grunt) {
                 }
             }
         },
+        //grunt-gh-pages to be used by travis to auto commit into gh-pages
         'gh-pages': {
             options: {
                 base: '.docs',
@@ -130,12 +152,14 @@ module.exports = function(grunt) {
                 '**'
             ]
         },
+        //grunt-coveralls to use the .lcov file
         coveralls: {
             lcov: {
                 // LCOV coverage file relevant to every target
                 src: '.coverage/reports/lcov.info'
             }
         },
+        //grunt-browserify task to generate bundled file for browser env
         browserify: {
             main: {
                 src: 'a11y-auditor.js',
@@ -147,6 +171,7 @@ module.exports = function(grunt) {
                 }
             }
         },
+        //grunt-contrib-watch task to watch files that change and run build
         watch: {
             files: [
                 'lib/**/*.js',
@@ -158,6 +183,10 @@ module.exports = function(grunt) {
     //register the grunt task for mocha tests on Jsdom
     grunt.registerTask('test', [
         'lint',
+        'clean:testCoverage',
+        'copy:main',
+        'env:coverage',
+        'instrument',
         'mochaTest'
     ]);
     //register the grunt task for linting
@@ -172,15 +201,14 @@ module.exports = function(grunt) {
     ]);
     //register the grunt task for coverage
     grunt.registerTask('coverage', [
-        'instrument',
-        'env:coverage',
-        'mochaTest',
+        'test',
         'storeCoverage',
         'makeReport',
         'coveralls:lcov'
     ]);
     //register the grunt task for documentation
     grunt.registerTask('document', [
+        'clean:docs',
         'docco-plus'
     ]);
     //register the default grunt tasks that need to be executed

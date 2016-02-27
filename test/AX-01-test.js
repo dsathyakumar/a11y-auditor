@@ -16,7 +16,7 @@ var chai = require('chai');
 var expect = chai.expect;
 
 //> getting the rule that needs to be unit tested - For eg: we override jquery with $ + jsdom
-var AX_01 = proxyquire('../lib/rulesImpl/AX_01',{'jquery':$});
+var AX_01 = proxyquire('../.coverage/instrument/lib/rulesImpl/AX_01', {jquery:$});
 
 //> mocha -setup describing the test suite
 describe('AX_01', function() {
@@ -26,11 +26,11 @@ describe('AX_01', function() {
         //build the required implementation
         var document = window.document;
         var imgString = document.createElement('img');
-        imgString.setAttribute('src','http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
-        imgString.setAttribute('alt','jquery logo');
+        imgString.setAttribute('src', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
+        imgString.setAttribute('alt', 'jquery logo');
 
         //invoke the handler of the rule
-        var result = AX_01.handler.call(null,imgString);
+        var result = AX_01.handler.call(null, imgString);
 
         //validate the result
         expect(result.RESULT).to.equal(true);
@@ -41,11 +41,11 @@ describe('AX_01', function() {
         //build the required implementation
         var document = window.document;
         var imgString = document.createElement('img');
-        imgString.setAttribute('src','http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
-        imgString.setAttribute('alt','');
+        imgString.setAttribute('src', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
+        imgString.setAttribute('alt', '');
 
         //invoke the handler of the rule
-        var result = AX_01.handler.call(null,imgString);
+        var result = AX_01.handler.call(null, imgString);
 
         //validate the result
         expect(result.TYPE).to.equal('warning');
@@ -56,11 +56,11 @@ describe('AX_01', function() {
         //build the required implementation
         var document = window.document;
         var imgString = document.createElement('img');
-        imgString.setAttribute('src','http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
-        imgString.setAttribute('role','presentation');
+        imgString.setAttribute('src', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
+        imgString.setAttribute('role', 'presentation');
 
         //invoke the handler of the rule
-        var result = AX_01.handler.call(null,imgString);
+        var result = AX_01.handler.call(null, imgString);
 
         //validate the result
         expect(result.RESULT).to.equal(true);
@@ -71,32 +71,32 @@ describe('AX_01', function() {
         //build the required implementation
         var document = window.document;
         var imgString = document.createElement('img');
-        imgString.setAttribute('src','http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
+        imgString.setAttribute('src', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
 
         //invoke the handler of the rule
-        var result = AX_01.handler.call(null,imgString);
+        var result = AX_01.handler.call(null, imgString);
 
         //validate the result
         expect(result.TYPE).to.not.equal(true);
     });
 
     //> Test case : 5
-    it('should FAIL if input type image tag has neither ROLE=presentation nor valid / empty alt', function(){
+    it('should FAIL if input type image tag has neither ROLE=presentation nor valid / empty alt', function() {
         //build the required implementation
         var document = window.document;
         var input = document.createElement('input');
-        input.setAttribute('type','image');
-        input.setAttribute('src','https://mdn.mozillademos.org/files/2917/fxlogo.png');
+        input.setAttribute('type', 'image');
+        input.setAttribute('src', 'https://mdn.mozillademos.org/files/2917/fxlogo.png');
 
         //invoke the handler of the rule
-        var result = AX_01.handler.call(null,input);
+        var result = AX_01.handler.call(null, input);
 
         //validate the result
         expect(result.RESULT).to.not.equal(true);
     });
 
     //> Test case : 6
-    it('should not be a global rule', function(){
+    it('should not be a global rule', function() {
         expect(AX_01.isGlobal).to.equal(false);
     });
 

@@ -16,7 +16,7 @@ var chai = require('chai');
 var expect = chai.expect;
 
 //> getting the rule that needs to be unit tested - For eg: we override jquery with $ + jsdom
-var AX_07 = proxyquire('../lib/rulesImpl/AX_07',{'jquery':$});
+var AX_07 = proxyquire('../.coverage/instrument/lib/rulesImpl/AX_07', {jquery:$});
 window.AX_07 = AX_07;
 
 //> mocha -setup describing the test suite
@@ -24,7 +24,7 @@ describe('AX_07', function() {
 
     //> Test case : 1
     it('should fail if page has NO title', function() {
-        var res = window.AX_07.handler.call(window,null);
+        var res = window.AX_07.handler.call(window, null);
         expect(res.RESULT).to.equal(false);
     });
 
@@ -34,10 +34,10 @@ describe('AX_07', function() {
         var title = window.document.createElement('title');
         title.innerHTML = 'Test page';
         //append the title into the head
-        var head= window.document.getElementsByTagName('head')[0];
+        var head = window.document.getElementsByTagName('head')[0];
         head.appendChild(title);
         //run the tests
-        var res = window.AX_07.handler.call(window,null);
+        var res = window.AX_07.handler.call(window, null);
         //remove the attached title
         head.removeChild(title);
         expect(res.TYPE).to.equal('warning');
@@ -49,10 +49,10 @@ describe('AX_07', function() {
         var title = window.document.createElement('title');
         title.innerHTML = 'Test page for AX_07 which tests for title';
         //append the title into the head
-        var head= window.document.getElementsByTagName('head')[0];
+        var head = window.document.getElementsByTagName('head')[0];
         head.appendChild(title);
         //run the tests
-        var res = window.AX_07.handler.call(window,null);
+        var res = window.AX_07.handler.call(window, null);
         //remove the attached title
         head.removeChild(title);
         expect(res.TYPE).to.equal('info');

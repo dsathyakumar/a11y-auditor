@@ -16,7 +16,7 @@ var chai = require('chai');
 var expect = chai.expect;
 
 //> getting the rule that needs to be unit tested - For eg: we override jquery with $ + jsdom
-var AX_03 = proxyquire('../lib/rulesImpl/AX_03',{'jquery':$});
+var AX_03 = proxyquire('../.coverage/instrument/lib/rulesImpl/AX_03', {jquery:$});
 
 //> mocha -setup describing the test suite
 describe('AX_03', function() {
@@ -26,18 +26,18 @@ describe('AX_03', function() {
         //build the required implementation
         var document = window.document;
         var imgString = document.createElement('img');
-        imgString.setAttribute('src','http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
-        imgString.setAttribute('alt','jquery logo');
+        imgString.setAttribute('src', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
+        imgString.setAttribute('alt', 'jquery logo');
 
         //invoke the handler of the rule
-        var result = AX_03.handler.call(null,imgString);
+        var result = AX_03.handler.call(null, imgString);
 
         //validate the result
         expect(result.RESULT).to.equal(true);
     });
 
     //> Test case : 2
-    it('should not be a global rule', function(){
+    it('should not be a global rule', function() {
         expect(AX_03.isGlobal).to.equal(false);
     });
 
@@ -46,12 +46,12 @@ describe('AX_03', function() {
         //build the required implementation
         var document = window.document;
         var imgString = document.createElement('img');
-        imgString.setAttribute('src','http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
-        imgString.setAttribute('alt','jquery logo');
+        imgString.setAttribute('src', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
+        imgString.setAttribute('alt', 'jquery logo');
         imgString.setAttribute('aria-expanded', 'false');
 
         //invoke the handler of the rule
-        var result = AX_03.handler.call(null,imgString);
+        var result = AX_03.handler.call(null, imgString);
 
         //validate the result
         expect(result.RESULT).to.equal(true);
@@ -62,12 +62,12 @@ describe('AX_03', function() {
         //build the required implementation
         var document = window.document;
         var imgString = document.createElement('img');
-        imgString.setAttribute('src','http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
-        imgString.setAttribute('alt','jquery logo');
+        imgString.setAttribute('src', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');
+        imgString.setAttribute('alt', 'jquery logo');
         imgString.setAttribute('aria-show', 'false');
 
         //invoke the handler of the rule
-        var result = AX_03.handler.call(null,imgString);
+        var result = AX_03.handler.call(null, imgString);
 
         //validate the result
         expect(result.RESULT).to.equal(false);

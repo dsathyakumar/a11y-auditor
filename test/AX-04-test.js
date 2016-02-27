@@ -18,7 +18,7 @@ var chai = require('chai');
 var expect = chai.expect;
 
 //> getting the rule that needs to be unit tested - For eg: we override jquery with $ + jsdom
-var AX_04 = proxyquire('../lib/rulesImpl/AX_04',{'jquery':$});
+var AX_04 = proxyquire('../.coverage/instrument/lib/rulesImpl/AX_04', {jquery:$});
 
 //> setting the handler into the window context and making it globaly available
 window.AX_04 = AX_04;
@@ -27,7 +27,7 @@ window.AX_04 = AX_04;
 describe('AX_04', function() {
 
     //> Test case : 1
-    it('should not be a global rule', function(){
+    it('should not be a global rule', function() {
         expect(AX_04.isGlobal).to.equal(false);
     });
 
@@ -36,21 +36,21 @@ describe('AX_04', function() {
 
         //build the required implementation - DIV
         var div1 = window.document.createElement('div');
-        div1.setAttribute('id','div1');
+        div1.setAttribute('id', 'div1');
         div1.innerHTML = 'Test page';
 
         //build the required implementation - DIV
         var div2 = window.document.createElement('div');
-        div2.setAttribute('id','div2');
+        div2.setAttribute('id', 'div2');
         div2.innerHTML = 'Test page';
 
         //append the objects into the body
-        var body= window.document.getElementsByTagName('body')[0];
+        var body = window.document.getElementsByTagName('body')[0];
         body.appendChild(div1);
         body.appendChild(div2);
 
         //run the tests
-        var res = window.AX_04.handler.call(window,div1);
+        var res = window.AX_04.handler.call(window, div1);
 
         //remove the attached title
         body.removeChild(div1);
@@ -65,21 +65,21 @@ describe('AX_04', function() {
 
         //build the required implementation - DIV
         var div1 = window.document.createElement('div');
-        div1.setAttribute('id','div1');
+        div1.setAttribute('id', 'div1');
         div1.innerHTML = 'Test page';
 
         //build the required implementation - DIV
         var div2 = window.document.createElement('div');
-        div2.setAttribute('id','div1');
+        div2.setAttribute('id', 'div1');
         div2.innerHTML = 'Test page';
 
         //append the objects into the body
-        var body= window.document.getElementsByTagName('body')[0];
+        var body = window.document.getElementsByTagName('body')[0];
         body.appendChild(div1);
         body.appendChild(div2);
 
         //run the tests
-        var res = window.AX_04.handler.call(window,div1);
+        var res = window.AX_04.handler.call(window, div1);
 
         //remove the attached title
         body.removeChild(div1);
