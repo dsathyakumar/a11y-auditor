@@ -175,12 +175,12 @@ Runs the above lint task and [mocha](https://mochajs.org) test cases over a samp
 
 ##### `coverage` task
 
-Runs [mocha](https://mochajs.org) test cases and collects the coverage reports
+Runs [mocha](https://mochajs.org) test cases and use [istanbul](https://gotwarlost.github.io/istanbul/) to instrument code & collects the coverage info to build coverage reports & submit .lcov to [coveralls.io](https://coveralls.io/) for code coverage
 
 
 ##### `build` task
 
-Generates the distribution file built via Browserify & also the Documentation and publishes it to the GH pages.
+Generates the distribution file built via [Browserify](http://browserify.org) & also the Documentation and publishes it to the GH pages.
 
 
 ##### `document` task
@@ -197,4 +197,4 @@ jQuery (v 2.2.0), lodash (4.3.0)
 
 #### Dev Dependencies :
 --------------------
-Grunt, Mocha, Chai, Browserify, jsdom, istanbul, grunt-watch, jsonlint, jscs, jshint, docco-plus, proxyquire, sinon-chai.
+Grunt, grunt-mocha-test, Chai, grunt-browserify, jsdom, grunt-istanbul, grunt-contrib-watch, grunt-jsonlint, grunt-jscs, grunt-contrib-jshint, docco-plus, proxyquire, sinon-chai, grunt-contrib-copy, grunt-contrib-clean.
