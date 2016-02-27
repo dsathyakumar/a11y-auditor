@@ -21,14 +21,27 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        //grunt-contrib-uglify tasks to minify the output from browserify
+        uglify: {
+            options: {
+                mangle: false
+            },
+            dist: {
+                files: {
+                    'dist/a11y-auditor.min.js': ['dist/a11y-auditor.js']
+                }
+            }
+        },
         //grunt-contrib-clean tasks to clean folders on every document, test, coverage tasks
         clean: {
             docs: ['.docs', '.cache'],
-            testCoverage: ['.coverage', '.test', '.cache']
+            testCoverage: ['.coverage', '.test', '.cache'],
+            postUglify: ['dist/a11y-auditor.js']
         },
         //grunt-contrib-copy tasks copies the lib folder and places it inside .coverage/instrument/
         copy: {
@@ -197,7 +210,9 @@ module.exports = function(grunt) {
     ]);
     //register the grunt task for browserify bundler
     grunt.registerTask('build', [
-        'browserify'
+        'browserify',
+        'uglify',
+        'clean:postUglify'
     ]);
     //register the grunt task for coverage
     grunt.registerTask('coverage', [
