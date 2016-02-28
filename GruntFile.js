@@ -175,11 +175,14 @@ module.exports = function(grunt) {
         //grunt-browserify task to generate bundled file for browser env
         browserify: {
             main: {
-                src: 'a11y-auditor.js',
+                src: 'index.js',
                 dest: 'dist/a11y-auditor.js',
                 options: {
+                    ignore: ['glob'],
+                    exclude: ['glob'],
                     browserifyOptions: {
-                        standalone: 'a11y-auditor'
+                        standalone: 'auditRunner',
+                        transform: ['require-globify']
                     }
                 }
             }

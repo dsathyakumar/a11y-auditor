@@ -1,8 +1,8 @@
 {
   "name": "a11y-auditor",
   "version": "0.0.11",
-  "description": "This a11y project is an implementation of accessibility rules as defined in W3C Accessibility Checklist",
-  "main": "a11y-auditor.js",
+  "description": "This a11y auditor aims at implementing unit tests for accessibility via chai-a11y, by automating the rules as defined in W3C Accessibility Checklist",
+  "main": "index.js",
   "author": "dsathyakumar <gautham.daamodhar@gmail.com>",
   "contributors": [{
     "name": "Pranav Shekhar Jha",
@@ -14,7 +14,12 @@
   "keywords": [
     "accessibility",
     "a11y",
-    "aria"
+    "aria",
+    "accessibility testing",
+    "accessibility unit testing",
+    "a11y testing",
+    "unit testing",
+    "accessibility audits"
   ],
   "repository": {
     "type": "git",
@@ -40,11 +45,13 @@
     "sinon-chai": "^2.8.0",
     "jsdom" : "3.1.2",
     "proxyquire" : "1.7.4",
-    "grunt-contrib-uglify" : "0.11.1"
+    "grunt-contrib-uglify" : "0.11.1",
+    "require-globify": "1.3.0"
   },
   "dependencies": {
     "jquery": "2.2.0",
-    "lodash": "^4.3.0"
+    "lodash": "^4.3.0",
+    "glob" : "~6.0.4"
   },
   "license": "MIT"
 }
