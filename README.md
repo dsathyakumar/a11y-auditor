@@ -129,6 +129,7 @@ module.exports = {
 ```
 
 `tagName` can take :
+
 1. ['comma separated array of tagNames'] if its not a Global Rule.
 2. [] if its a Global Rule as its not tag specific and will execute just once for the document.
 3. ['\*'] if its to execute for all rules
