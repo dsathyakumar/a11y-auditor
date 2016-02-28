@@ -1,0 +1,2 @@
+service_name: travis-ci
+repo_token: <ADD_YOUR_REPO_TOKEN_HERE>
