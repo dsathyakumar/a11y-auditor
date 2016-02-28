@@ -42,7 +42,7 @@ Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA co
 
 #### For Node JS usage :
 ---------------------------------------------------------
-require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function ()]. Use it in your module. But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style assertions via chai js and can be integrated with mocha tests and run on development machines and CI.
+require the module as require('a11y-auditor') and add it to the dependencies. This will return a [function ()]. Use it in your module. But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style `to.be.accessible()` interface via chai js and can be integrated with mocha tests and run on development machines and CI.
 
 ```
 var auditRunner = require('a11y-auditor');
@@ -60,12 +60,14 @@ window.onload = function(){
 		auditRunner(htmlSelector, rulesConfig, auditConfig);
 }
 ```
-But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style assertions via CHAI JS and can be integrated with mocha tests and run on development machines and CI.
+But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style `to.be.accessible()` interface via chai and can be integrated with mocha tests and run on development machines and CI.
+
 
 
 #### For JAVA projects :
 ---------------------------------------------------------
 It is possible to run a grunt workflow via MAVEN builds using the [Front end maven plugin](https://github.com/eirslett/frontend-maven-plugin) and execute test cases built on mocha and chai. The above setup for a11y-auditor & chai-a11y ( mentioned above for Node JS ) holds good here as well, as the Front End Maven plugin downloads and installs a node executable. You will have to [integrate your project](https://www.linkedin.com/pulse/node-npm-java-maven-damodaran-sathyakumar) with the Front End Maven Plugin before attempting to use a11y-auditor for JAVA based projects built on JSP / JSF / Struts.
+
 
 
 #### Method definition of method exported by the Module :
@@ -90,6 +92,7 @@ auditConfig takes in 2 properties / keys :
 - *'compliance'* : Takes one of the 3 strings : 'A', 'AA', 'AAA'.
 
 
+
 #### To ignore a few rules :
 -----------------------
 
@@ -105,24 +108,33 @@ function(“htmlSelector”, {
 ```
 
 
+
 #### To author new rules :
 ---------------------------------------------------------
 1. Create a new numbered rule named file AX_XX.js (eg: AX_01.js) under lib/rulesImpl
 2. Follow the pattern in which the files are authored under lib/rulesImpl/AX_XXX.js
-3. Place an entry in lib/rulesProcessor/rulesExecutor.js (for the auditRunner to pick up your rule)
-4. The exported object via module.exports will contain the following:
+3. The exported object via module.exports will contain the following:
 
 ```
 module.exports = {
 	name: "shortNameMentioningWhatThisRuleDoes",
 	description: "Detailed description of the rule",
 	ruleID: "AX_XXX",
-	tagName: ['array of tagName affected'],
+	tagName: ['comma separated array of tagNames'], // the rule will execute for the tags mentioned here
 	handler: Handler function Implementation,
 	isGlobal: Boolean //to indicate if this rule checks on document level checks,
 	compliance : 'AA'
 };
+
 ```
+
+`tagName` can take :
+1. ['comma separated array of tagNames'] if its not a Global Rule.
+2. [] if its a Global Rule as its not tag specific and will execute just once for the document.
+3. ['\*'] if its to execute for all rules
+
+`compliance` can take : A, AA, AAA
+
 
 
 #### File Structure :
@@ -141,11 +153,14 @@ module.exports = {
 | lib/utils  | Code containing utils for enum creation, DOM object checks and dependency injections  |
 | test/  | The test cases written for this project  |
 
+
+
 #### Implementation Tests :
 --------------------
 
 Individual tests for each of the rules implemented have been placed under tests. The test cases are built with the help of
 [Mocha](http://mochajs.org) and [Chai](http://chaijs.com) for BDD style assertions. The tests are integrated into the workflow via Grunt.
+
 
 
 #### Rule Understanding:
@@ -193,12 +208,14 @@ Generates Code Documentation using [docco-plus](https://www.npmjs.com/package/do
 #### Dependencies :
 --------------------
 
-jQuery (v 2.2.0), lodash (4.3.0)
+jQuery (v 2.2.0), lodash (4.3.0), glob (6.0.4)
+
 
 
 #### Dev Dependencies :
 --------------------
-Grunt, grunt-mocha-test, Chai, grunt-browserify, jsdom, grunt-istanbul, grunt-contrib-watch, grunt-jsonlint, grunt-jscs, grunt-contrib-jshint, docco-plus, proxyquire, sinon-chai, grunt-contrib-copy, grunt-contrib-clean.
+Grunt, grunt-mocha-test, Chai, grunt-browserify, jsdom, grunt-istanbul, grunt-contrib-watch, grunt-jsonlint, grunt-jscs, grunt-contrib-jshint, docco-plus, proxyquire, sinon-chai, grunt-contrib-copy, grunt-contrib-clean, require-globify
+
 
 
 #### Ideation & Contributors :
