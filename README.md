@@ -121,7 +121,7 @@ module.exports = {
 	description: "Detailed description of the rule",
 	ruleID: "AX_XXX",
 	tagName: ['comma separated array of tagNames'], // the rule will execute for the tags mentioned here
-	handler: Handler function Implementation,
+	handler: function(){/* Your implementation here */},
 	isGlobal: Boolean //to indicate if this rule checks on document level checks,
 	compliance : 'AA'
 };
@@ -130,11 +130,13 @@ module.exports = {
 
 `tagName` can take :
 
-1. ['comma separated array of tagNames'] if its not a Global Rule.
-2. [] if its a Global Rule as its not tag specific and will execute just once for the document.
-3. ['\*'] if its to execute for all rules
+1. ['comma separated array of tagNames'] - if its not a Global Rule.
+2. [ ] - if its a Global Rule as its not tag specific and will execute just once for the document.
+3. ['\*'] - if its to execute for all tags
 
 `compliance` can take : A, AA, AAA
+
+`isGlobal` can take : true / false
 
 
 
