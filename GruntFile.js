@@ -213,6 +213,7 @@ module.exports = function(grunt) {
     ]);
     //register the grunt task for browserify bundler
     grunt.registerTask('build', [
+        'lint',
         'browserify',
         'uglify',
         'clean:postUglify'

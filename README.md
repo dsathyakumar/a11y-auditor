@@ -21,7 +21,7 @@
 
 > This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
-> Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y BDD style accessibility assertions](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests itself. This helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
+> Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests phase itself. [chai-a11y](https://github.com/pranavjha/chai-a11y) provides a BDD style `to.be.accessible()` interface for asserting a11y audits. This audit, helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
 
 > Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
 
@@ -30,6 +30,7 @@
 > **Status** : Dev (in progress)
 
 **Pull requests are welcome!**
+
 
 
 #### TIP :
@@ -96,16 +97,21 @@ auditConfig takes in 2 properties / keys :
 #### To ignore a few rules :
 -----------------------
 
+`As an example :`
+
 ```
-function(“htmlSelector”, {
-	‘selector_1’ : [‘array of rules to ignore’],
-	‘selector_2’ : [‘array of rules to ignore’],
-	‘selector_3’ : [‘*’] //* will skip all rules for the selector
+function(“img”, {
+	‘img’ : [‘AX_01’, 'AX_04'],
+	‘#sampleId1’ : [‘AX_22’, 'AX_33'],
+	‘title’ : [‘*’] //* will skip all rules for the selector
 },{
 	executeGlobalRules : true,
 	compliance : 'AA'
 	});
+
 ```
+
+**Note :** If there is no HTML partial object or selector passed, it will perform the audit for the whole document
 
 
 
@@ -173,6 +179,7 @@ The a11y-auditor aims to automate rules defined in the [W3C Accessibility Checkl
 In order to make creation of rules easier, each rule is implemented in a modular fashion in a separate file. To understand what each rule does, look at the a11y.properties.json file.
 
 
+
 #### Build Tasks
 --------------------
 
@@ -224,3 +231,8 @@ Grunt, grunt-mocha-test, Chai, grunt-browserify, jsdom, grunt-istanbul, grunt-co
 #### Ideation & Contributors :
 --------------------
 [@pranavjha](https://github.com/pranavjha/)
+
+
+#### License
+-------------
+> The MIT License (MIT)
