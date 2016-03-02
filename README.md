@@ -46,9 +46,7 @@
 
 > Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
 
-> **NPM MODULE** of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
-
-> **Status** : Dev (in progress)
+**Status** : Dev (in progress)
 
 **Pull requests are welcome!**
 
