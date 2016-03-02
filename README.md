@@ -48,7 +48,7 @@
 > Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
 
 
-#### Status ?
+#### Status
 
 **Status** : Dev (in progress) & **Pull requests are welcome!**
 
