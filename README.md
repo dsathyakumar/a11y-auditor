@@ -18,6 +18,27 @@
 [![NPM](https://nodei.co/npm/a11y-auditor.png)](https://nodei.co/npm/a11y-auditor/)
 
 
+#### Table of Contents
+- [What is this? What does it do ?](#what-is-this)
+- [Usage Tip with chai-a11y for BDD style to.be.accessible() assertions](#usage)
+- [Configuring for Node JS Usage](#contacts)
+- [Configuring for Browser usage (include <script...> and run without AMD)](#contacts)
+- [Configuring for JAVA projects](#contacts)
+- [Method definition of method exported by the Module](#resources)
+- [Skipping / Ignoring a few rules for some elements](#resources)
+- [How to author new rules ?](#resources)
+- [File Structure of the project](#resources)
+- [Test Cases](#resources)
+- [Understanding of the rules implemented](#resources)
+- [Build Tasks for the project](#resources)
+- [Dependencies](#resources)
+- [Dev Dependencies](#resources)
+- [Contributors](#resources)
+- [License](#resources)
+
+
+#### What is this? What does it do ?
+
 
 > This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
@@ -33,7 +54,7 @@
 
 
 
-#### TIP :
+#### Usage Tip :
 ---------------------------------------------------------
 Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages as part of your Dev testing (unit tests) itself via the [chai-a11y](https://github.com/pranavjha/chai-a11y) plugin.
 
