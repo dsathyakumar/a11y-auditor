@@ -20,6 +20,7 @@
 
 #### Table of Contents
 - [What is this? What does it do ?](#what-is-this-what-does-it-do-)
+- [Status](#status)
 - [Usage Tip with chai-a11y for BDD style to.be.accessible() assertions](#usage-tip-)
 - [Configuring for Node JS Usage](#for-node-js-usage-)
 - [Configuring for Browser usage (include <script...> and run without AMD)](#for-browser-usage-include--and-run-without-amd)
@@ -46,9 +47,10 @@
 
 > Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
 
-**Status** : Dev (in progress)
 
-**Pull requests are welcome!**
+#### Status ?
+
+**Status** : Dev (in progress) & **Pull requests are welcome!**
 
 
 
