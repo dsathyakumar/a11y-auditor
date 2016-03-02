@@ -19,22 +19,22 @@
 
 
 #### Table of Contents
-- [What is this? What does it do ?](#what-is-this)
-- [Usage Tip with chai-a11y for BDD style to.be.accessible() assertions](#usage)
-- [Configuring for Node JS Usage](#contacts)
-- [Configuring for Browser usage (include <script...> and run without AMD)](#contacts)
-- [Configuring for JAVA projects](#contacts)
-- [Method definition of method exported by the Module](#resources)
-- [Skipping / Ignoring a few rules for some elements](#resources)
-- [How to author new rules ?](#resources)
-- [File Structure of the project](#resources)
-- [Test Cases](#resources)
-- [Understanding of the rules implemented](#resources)
-- [Build Tasks for the project](#resources)
-- [Dependencies](#resources)
-- [Dev Dependencies](#resources)
-- [Contributors](#resources)
-- [License](#resources)
+- [What is this? What does it do ?](#what-is-this-what-does-it-do-)
+- [Usage Tip with chai-a11y for BDD style to.be.accessible() assertions](#usage-tip-)
+- [Configuring for Node JS Usage](#for-node-js-usage-)
+- [Configuring for Browser usage (include <script...> and run without AMD)](#for-browser-usage-include--and-run-without-amd)
+- [Configuring for JAVA projects](#for-java-projects-)
+- [Method definition of method exported by the Module](#method-definition-of-method-exported-by-the-module-)
+- [Skipping / Ignoring a few rules for some elements](#to-ignore-a-few-rules-)
+- [How to author new rules ?](#to-author-new-rules-)
+- [File Structure of the project](#file-structure-)
+- [Test Cases](#implementation-tests-)
+- [Understanding of the rules implemented](#rule-understanding)
+- [Build Tasks for the project](#build-tasks)
+- [Dependencies](#dependencies-)
+- [Dev Dependencies](#dev-dependencies-)
+- [Contributors](#ideation--contributors-)
+- [License](#license)
 
 
 #### What is this? What does it do ?
