@@ -25,7 +25,7 @@
 - [Configuring for Node JS Usage](#for-node-js-usage-)
 - [Configuring for Browser usage (include <script...> and run without AMD)](#for-browser-usage-include--and-run-without-amd)
 - [Configuring for JAVA projects](#for-java-projects-)
-- [Configuring for phantomJS CLI](#for-java-projects-)
+- [Configuring for phantomJS CLI](#configuring-to-run-on-a-phantomjs-cli-)
 - [Method definition of method exported by the Module](#method-definition-of-method-exported-by-the-module-)
 - [Skipping / Ignoring a few rules for some elements](#to-ignore-a-few-rules-)
 - [How to author new rules ?](#to-author-new-rules-)
