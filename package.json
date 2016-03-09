@@ -25,6 +25,9 @@
     "type": "git",
     "url": "https://github.com/dsathyakumar/a11y-auditor"
   },
+  "engines": {
+    "node": ">=0.10.36"
+  },
   "devDependencies": {
     "chai": "^3",
     "grunt": "^0",
