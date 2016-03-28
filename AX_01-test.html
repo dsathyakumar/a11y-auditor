@@ -4,6 +4,11 @@
 
     <!--Loading all script tags in the head for now -->
 		<script src="dist/a11y-auditor.min.js"></script>
+		<script>
+			window.onload = function(){
+				console.log(window.auditRunner('html'));
+			}
+		</script>
 
 	</head>
 	<body>
