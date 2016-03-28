@@ -1,6 +1,6 @@
 {
   "name": "a11y-auditor",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "This a11y auditor aims at implementing unit tests for accessibility via chai-a11y, by automating the rules as defined in W3C Accessibility Checklist",
   "main": "index.js",
   "author": "dsathyakumar <gautham.daamodhar@gmail.com>",
