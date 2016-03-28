@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<title></title>
+
+    <!--Loading all script tags in the head for now -->
+		<script src="dist/a11y-auditor.min.js"></script>
+
+	</head>
+	<body>
+		<div>
+			<div></div>
+		</div>
+		<!-- PASSED : because it has a valid ALT attribute-->
+		<img alt="jquery" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_1"></img>
+
+		<!-- Failed because of no ALT nor valid ROLE attribute-->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_2"></img>
+
+		<!-- PASSED WITH WARNING. As ALT attribute exist but its empty -->
+		<img alt="" src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_3"></img>
+
+		<!-- PASSED. Has a valid ROLE attribute -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="presentation" id="img_4"></img>
+
+		<!-- Failed because of invalid role attribute and -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="xcvdfer"></img>
+
+		<!-- Failed because it has no role nor alt attribute -->
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_5"></img>
+
+
+	</body>
+</html>
