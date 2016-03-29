@@ -17,49 +17,49 @@
             "description": "Check if the current Element has an invalid ARIA attribute",
             "name": "invalidAriaAttribute",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AA"
         },
         "AX_04": {
             "description": "Check if element ID is unique",
             "name": "isIdUnique",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_05": {
             "description": "An element's ID must not be present in more that one aria-owns attribute at any time",
             "name": "isIdInAria_OwnsUnique",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_06": {
             "description": "Any ID referred to via an IDREF must be unique in the DOM",
             "name": "isIdInIdRefUnique",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_07": {
             "description": "The webpage should have a title that describes topic or purpose",
             "name": "hasTitle",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_08": {
             "description": "Provide summaries for tables",
             "name": "hasSummary",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_09": {
             "description": "Provide abbreviations for header labels",
             "name": "hasAbbr",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_10": {
             "description": "Provide a caption via the CAPTION element. A table CAPTION describes the table in one to three sentences",
             "name": "hasCaption",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_11": {
             "description": "Elements with ARIA roles must use a valid, non-abstract ARIA role.",
@@ -71,31 +71,31 @@
             "description": "The web page should have the content's human language indicated in the markup. Identify the primary natural language of the document",
             "name": "hasLangAttribute",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_13": {
             "description": "There should be only one main element for a web page document",
             "name": "hasMoreThanOneRoleMain",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_14": {
             "description": "Presence of Title attribute for ABBR, OBJECT, APPLET, MAP, ACRONYM and A. Specify the expansion of each abbreviation or acronym in a document where it first occurs",
             "name": "hasTitleAttribute",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AA"
         },
         "AX_15": {
             "description": "Certain reserved elements do not support ARIA roles, states and properties",
             "name": "isAriaOnReservedElement",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_16": {
             "description": "Avoid Deprecated features of W3C technologies",
             "name": "isDeprecatedElement",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_17": {
             "description": "Avoid using the style attribute and defining styles inline and move them to stylesheets instead",
@@ -107,7 +107,7 @@
             "description": "Until user agents handle empty controls correctly, include default placeholding characters in edit boxes and text areas and form elements that can take default values",
             "name": "hasDefaultPlaceholderTexts",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_19": {
             "description": "Associate labels explicitly with their controls",
@@ -137,7 +137,7 @@
             "description": "Provide keyboard shortcuts to important links (including those in client-side image maps), form controls, and groups of form controls",
             "name": "hasAccessKeyEnabled",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_24": {
             "description": "Check if there is atleast one header section / element for the page content that defines its purpose & context",
@@ -203,7 +203,7 @@
             "description": "Check for presence of a DOCTYPE",
             "name": "hasDoctype",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_35": {
             "description": "Table TD tags are to be associated to corresponding TH header tags of the table via the headers attribute",

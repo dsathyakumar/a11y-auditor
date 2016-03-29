@@ -9,5 +9,6 @@
     "requireSpacesInsideObjectBrackets": null,
     "requireSpacesInAnonymousFunctionExpression": null,
     "requireDollarBeforejQueryAssignment": null,
-    "disallowYodaConditions" : false
+    "disallowYodaConditions" : false,
+    "maximumLineLength": { "value": 1000, "allExcept": [ "functionSignature" ] }
 }

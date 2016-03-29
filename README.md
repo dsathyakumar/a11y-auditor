@@ -18,6 +18,29 @@
 [![NPM](https://nodei.co/npm/a11y-auditor.png)](https://nodei.co/npm/a11y-auditor/)
 
 
+#### Table of Contents
+- [What is this? What does it do ?](#what-is-this-what-does-it-do-)
+- [Status](#status)
+- [Usage Tip with chai-a11y for BDD style to.be.accessible() assertions](#usage-tip-)
+- [Configuring for Node JS Usage](#for-node-js-usage-)
+- [Configuring for Browser usage (include <script...> and run without AMD)](#for-browser-usage-include--and-run-without-amd)
+- [Configuring for JAVA projects](#for-java-projects-)
+- [Configuring for phantomJS CLI](#configuring-to-run-on-a-phantomjs-cli-)
+- [Method definition of method exported by the Module](#method-definition-of-method-exported-by-the-module-)
+- [Skipping / Ignoring a few rules for some elements](#to-ignore-a-few-rules-)
+- [How to author new rules ?](#to-author-new-rules-)
+- [File Structure of the project](#file-structure-)
+- [Test Cases](#implementation-tests-)
+- [Understanding of the rules implemented](#rule-understanding)
+- [Build Tasks for the project](#build-tasks)
+- [Dependencies](#dependencies-)
+- [Dev Dependencies](#dev-dependencies-)
+- [Contributors](#ideation--contributors-)
+- [License](#license)
+
+
+#### What is this? What does it do ?
+
 
 > This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
@@ -25,15 +48,14 @@
 
 > Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
 
-> **NPM MODULE** of [a11y-auditor](https://www.npmjs.com/package/a11y-auditor)
 
-> **Status** : Dev (in progress)
+#### Status
 
-**Pull requests are welcome!**
-
+**Status** : Dev (in progress) & **Pull requests are welcome!**
 
 
-#### TIP :
+
+#### Usage Tip :
 ---------------------------------------------------------
 Its recommended to use a11y-auditor to run accessibility audit for A, AA, AAA compliance on your web pages as part of your Dev testing (unit tests) itself via the [chai-a11y](https://github.com/pranavjha/chai-a11y) plugin.
 
@@ -69,6 +91,15 @@ But its recommended to use a11y-auditor with the chai-a11y plugin that provides 
 ---------------------------------------------------------
 It is possible to run a grunt workflow via MAVEN builds using the [Front end maven plugin](https://github.com/eirslett/frontend-maven-plugin) and execute test cases built on mocha and chai. The above setup for a11y-auditor & chai-a11y ( mentioned above for Node JS ) holds good here as well, as the Front End Maven plugin downloads and installs a node executable. You will have to [integrate your project](https://www.linkedin.com/pulse/node-npm-java-maven-damodaran-sathyakumar) with the Front End Maven Plugin before attempting to use a11y-auditor for JAVA based projects built on JSP / JSF / Struts.
 
+
+#### Configuring to run on a phantomJS CLI :
+---------------------------------------------------------
+The a11y-auditor has a command line runner to conduct the audit on static HTML files and on any URL's directly. To use the runner, install phantomjs then run the following command from the project root directory.
+
+```
+$ phantomjs path/to/phantomRunner.js <path-to-StaticFile-or-URL> <path-To-A11yAuditor-Distribution-File> <path-to-outPutFile>
+
+```
 
 
 #### Method definition of method exported by the Module :
