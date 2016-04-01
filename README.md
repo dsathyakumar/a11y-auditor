@@ -44,7 +44,9 @@
 
 > This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
-> Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests phase itself. [chai-a11y](https://github.com/pranavjha/chai-a11y) provides a BDD style `to.be.accessible()` interface for asserting a11y audits. This audit, helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
+> Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests phase itself.
+
+> [chai-a11y](https://github.com/pranavjha/chai-a11y) provides a BDD style `to.be.accessible()` interface for asserting a11y audits. This audit, helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
 
 > Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
 
@@ -70,7 +72,7 @@ require the module as require('a11y-auditor') and add it to the dependencies. Th
 ```
 var auditRunner = require('a11y-auditor');
 
-var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
+var result = auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 ```
 
 
@@ -80,7 +82,7 @@ Use the distribution file at dist/browser/main.js. Implement it as :
 
 ```
 window.onload = function(){
-		auditRunner(htmlSelector, rulesConfig, auditConfig);
+		window.auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 }
 ```
 But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style `to.be.accessible()` interface via chai and can be integrated with mocha tests and run on development machines and CI.
@@ -110,7 +112,7 @@ The method takes in 3 parameters:
 ```
 var auditRunner = require('a11y-auditor');
 
-var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
+var result = auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 
 ```
 
@@ -121,7 +123,7 @@ var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
 auditConfig takes in 2 properties / keys :
 
 - *'executeGlobalRules'*: A Boolean to indicate whether global rules that audit the whole document need to be ignored.
-- *'compliance'* : Takes one of the 3 strings : 'A', 'AA', 'AAA'.
+- *'compliance'* : Takes an array, containing values from : 'A', 'AA', 'AAA'.
 
 
 
@@ -137,12 +139,12 @@ function(“img”, {
 	‘title’ : [‘*’] //* will skip all rules for the selector
 },{
 	executeGlobalRules : true,
-	compliance : 'AA'
+	compliance : ['AA']
 	});
 
 ```
 
-**Note :** If there is no HTML partial object or selector passed, it will perform the audit for the whole document
+**Note :** If there is no HTML partial object or selector passed, it will perform the audit for the whole document, under the assumption that `a11y-auditor.min.js` is included inside an HTML document.
 
 
 
@@ -160,7 +162,7 @@ module.exports = {
 	tagName: ['comma separated array of tagNames'], // the rule will execute for the tags mentioned here
 	handler: function(){/* Your implementation here */},
 	isGlobal: Boolean //to indicate if this rule checks on document level checks,
-	compliance : 'AA'
+	compliance : ['AA']
 };
 
 ```
@@ -171,7 +173,7 @@ module.exports = {
 2. [] - if its a Global Rule as its not tag specific and will execute just once for the document.
 3. ['\*'] - if its to execute for all tags
 
-`compliance` can take : A, AA, AAA
+`compliance` can take values from : A, AA, AAA
 
 `isGlobal` can take : true / false
 
