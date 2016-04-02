@@ -78,7 +78,9 @@ var result = auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 
 #### For Browser usage (include <script...> and run without AMD):
 ---------------------------------------------------------
-Use the distribution file at dist/browser/main.js. Implement it as :
+Use the distribution file at `dist/browser/a11y-auditor.min.js`. This comes bundled with dependencies like `jQuery (v 2.2.0)`, `lodash (4.3.0)`. However, if you just want the source file alone, its available at `dist/browser/a11y-auditor.min.only.js`
+
+Implement it as :
 
 ```
 window.onload = function(){

@@ -33,7 +33,8 @@ module.exports = function(grunt) {
             },
             dist: {
                 files: {
-                    'dist/a11y-auditor.min.js': ['dist/a11y-auditor.js']
+                    'dist/a11y-auditor.min.js': ['dist/a11y-auditor.js'],
+                    'dist/a11y-auditor.min.only.js': ['dist/a11y-auditor.src.js']
                 }
             }
         },
@@ -41,7 +42,7 @@ module.exports = function(grunt) {
         clean: {
             docs: ['.docs', '.cache'],
             testCoverage: ['.coverage', '.test', '.cache'],
-            postUglify: ['dist/a11y-auditor.js']
+            postUglify: ['dist/a11y-auditor.js', 'dist/a11y-auditor.src.js']
         },
         //grunt-contrib-copy tasks copies the lib folder and places it inside .coverage/instrument/
         copy: {
@@ -185,6 +186,18 @@ module.exports = function(grunt) {
                         transform: ['require-globify']
                     }
                 }
+            },
+            srcOnly: {
+                src: 'index.js',
+                dest: 'dist/a11y-auditor.src.js',
+                options: {
+                    ignore: ['glob', 'jquery', 'lodash/core'],
+                    exclude: ['glob', 'jquery', 'lodash/core'],
+                    browserifyOptions: {
+                        standalone: 'auditRunner',
+                        transform: ['require-globify']
+                    }
+                }
             }
         },
         //grunt-contrib-watch task to watch files that change and run build
@@ -214,7 +227,8 @@ module.exports = function(grunt) {
     //register the grunt task for browserify bundler
     grunt.registerTask('build', [
         'lint',
-        'browserify',
+        'browserify:main',
+        'browserify:srcOnly',
         'uglify',
         'clean:postUglify'
     ]);
