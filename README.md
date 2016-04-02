@@ -129,12 +129,13 @@ auditConfig takes in 2 properties / keys :
 
 #### To ignore a few rules :
 -----------------------
+Rules can be ignored by passing the ruleID or the short name of the rule.
 
 `As an example :`
 
 ```
 function(“img”, {
-	‘img’ : [‘AX_01’, 'AX_04'],
+	‘img’ : [‘imageWithoutAltText'],
 	‘#sampleId1’ : [‘AX_22’, 'AX_33'],
 	‘title’ : [‘*’] //* will skip all rules for the selector
 },{
@@ -143,6 +144,7 @@ function(“img”, {
 	});
 
 ```
+In the above example, for the `#sampleId1`, rules `AX_22` and `AX_33` are skipped.
 
 **Note :** If there is no HTML partial object or selector passed, it will perform the audit for the whole document, under the assumption that `a11y-auditor.min.js` is included inside an HTML document.
 
