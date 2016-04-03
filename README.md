@@ -118,40 +118,59 @@ var result = auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 
 ```
 
-1. **htmlSelector or DOM object** - A valid HTML selector or a DOM object (containing child nodes is also cool) (eg. 'button')
+1. **htmlSelector or DOM object** - A valid HTML selector or a DOM object or a jquery DOM object (containing child nodes is also cool) (eg. 'button')
 2. **rulesConfig** - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
 3. **auditConfig** - A config obj for the a11y-auditor that governs compliance, global rules execution etc.,
 
-auditConfig takes in 2 properties / keys :
+`auditConfig` takes in 3 properties / keys :
 
 - *'executeGlobalRules'*: A Boolean to indicate whether global rules that audit the whole document need to be ignored.
-- *'compliance'* : Takes an array, containing values from : 'A', 'AA', 'AAA'.
+- *'compliance'* : Takes an array, containing values from : `'A', 'AA', 'AAA'`
+- *'displayOptions'* : Takes one of the values ` 'error', 'warning', 'errAndWarn' `
 
 
 
 #### To ignore a few rules :
 -----------------------
-Rules can be ignored by passing the ruleID or the short name of the rule.
+Rules can be ignored by passing the `ruleID` or the `short name` of the rule.
 
 `As an example :`
 
 ```
-function(“img”, {
+window.auditRunner.run(“img”, {
 	‘img’ : [‘imageWithoutAltText'],
 	‘#sampleId1’ : [‘AX_22’, 'AX_33'],
 	‘title’ : [‘*’] //* will skip all rules for the selector
 },{
 	executeGlobalRules : true,
-	compliance : ['AA']
+	compliance : ['AA'],
+	displayOptions : 'errAndWarn'
 	});
 
 ```
-In the above example, for the `#sampleId1`, rules `AX_22` and `AX_33` are skipped.
-And, `AA` compliance is only tested for. For all objects corresponding to `img` selector, the `imageWithoutAltText` is skipped.
+In the above example, for the selector `#sampleId1`, rules `AX_22` and `AX_33` are skipped.
+And, `AA` compliance is only tested for.
+For all objects corresponding to `img` selector, the `imageWithoutAltText` is skipped.
+Since the `displayOptions` is set to `errAndWarn`, all errors and Warnings are shown.
 
 **Note :** If there is no HTML partial object or selector passed, it will perform the audit for the whole document, under the assumption that `a11y-auditor.min.js` is included inside an HTML document.
 
 
+#### To execute only a selected few rules :
+-----------------------
+Only a select set of few rules can be executed on a given selector or DOM object.
+
+`As an example :`
+
+```
+window.auditRunner.runOnly(“img”, {
+	‘img’ : [‘imageWithoutAltText']
+});
+
+```
+
+In the above example, for the selector `img`, only the rule `imageWithoutAltText` is executed.
+Any other valid rules which may exist for this selector, is just ignored. This helps to run targeted rules on components or widgets. Also, only the first element matching the selector is used to run this test on.
 
 #### To author new rules :
 ---------------------------------------------------------
