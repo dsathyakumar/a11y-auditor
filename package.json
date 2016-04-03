@@ -7,6 +7,9 @@
   "contributors": [{
     "name": "Pranav Shekhar Jha",
     "email": "jha.pranav.s@gmail.com"
+  },{
+    "name": "Gopal J",
+    "email": "gopj@ebay.com"
   }],
   "scripts": {
       "test": "grunt test"
