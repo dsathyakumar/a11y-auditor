@@ -6,7 +6,7 @@
 		<script src="dist/a11y-auditor.min.js"></script>
 		<script>
 			window.onload = function(){
-				console.log(window.auditRunner.run('html'));
+				console.log(window.auditRunner.run('img'));
 			}
 		</script>
 
@@ -28,7 +28,7 @@
 		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="presentation" id="img_4"></img>
 
 		<!-- Failed because of invalid role attribute and -->
-		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="xcvdfer"></img>
+		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" role="xcvdfer" id="img_6"></img>
 
 		<!-- Failed because it has no role nor alt attribute -->
 		<img src="http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png" id="img_5"></img>
