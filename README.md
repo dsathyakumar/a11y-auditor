@@ -101,10 +101,10 @@ It is possible to run a grunt workflow via MAVEN builds using the [Front end mav
 The a11y-auditor has a command line runner to conduct the audit on static HTML files and on any URL's directly. To use the runner, install phantomjs then run the following command from the project root directory.
 
 ```
-$ phantomjs path/to/phantomRunner.js <path-to-StaticFile-or-URL> <path-To-A11yAuditor-Distribution-File> <path-to-outPutFile>
+$ phantomjs phantomRunner/phantomRunner.js <path-to-StaticFile-or-URL> <path-To-A11yAuditor-Distribution-File> <path-to-outPutFile>
 
 ```
-
+The `phantomRunner.js` can be found at `phantomRunner/phantomRunner.js` in the repo.
 
 #### Method definition of method exported by the Module :
 --------------------------------------------------

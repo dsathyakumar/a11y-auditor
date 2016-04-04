@@ -1,6 +1,6 @@
 {
   "name": "a11y-auditor",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "This a11y auditor aims at implementing unit tests for accessibility via chai-a11y, by automating the rules as defined in W3C Accessibility Checklist",
   "main": "index.js",
   "author": "dsathyakumar <gautham.daamodhar@gmail.com>",
@@ -30,6 +30,12 @@
   },
   "engines": {
     "node": ">=0.10.36"
+  },
+  "bugs": {
+    "url": "https://github.com/dsathyakumar/a11y-auditor/issues"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
     "chai": "^3",
