@@ -64,7 +64,7 @@ describe('AX_38', function() {
         var result = AX_38.handler.call(null, aTarget);
 
         //validate the result
-        expect(result.RESULT).to.equal(true);
+        expect(result.RESULT).to.equal(false);
     });
 
 
