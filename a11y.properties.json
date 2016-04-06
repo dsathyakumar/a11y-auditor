@@ -219,7 +219,7 @@
         },
         "AX_37": {
             "description": "Anchor element with target _blank should have an hidden label 'opens in a new window ot tab'",
-            "name": "anchorWithTargetblankLabelText",
+            "name": "anchorWithTargetblank",
             "isGlobal": "false",
             "compliance": "AA"
         }
