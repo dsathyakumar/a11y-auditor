@@ -222,6 +222,12 @@
             "name": "anchorWithTargetblank",
             "isGlobal": "false",
             "compliance": "AA"
+        },
+        "AX_38": {
+            "description": "If there is a submit button, check if its included inside a form",
+            "name": "submitWithinaForm",
+            "isGlobal": "false",
+            "compliance": "AA"
         }
     }
 }
