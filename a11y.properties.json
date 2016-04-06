@@ -5,13 +5,13 @@
             "description": "Images should have an alt attribute, unless they have an ARIA role of presentation",
             "name": "imageWithoutAltText",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_02": {
             "description": "Avoid positive values for Tab index",
             "name": "avoidPositiveTabIndex",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_03": {
             "description": "Check if the current Element has an invalid ARIA attribute",
@@ -65,7 +65,7 @@
             "description": "Elements with ARIA roles must use a valid, non-abstract ARIA role.",
             "name": "hasValidAriaRole",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AA"
         },
         "AX_12": {
             "description": "The web page should have the content's human language indicated in the markup. Identify the primary natural language of the document",
@@ -101,7 +101,7 @@
             "description": "Avoid using the style attribute and defining styles inline and move them to stylesheets instead",
             "name": "hasInlineStyles",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_18": {
             "description": "Until user agents handle empty controls correctly, include default placeholding characters in edit boxes and text areas and form elements that can take default values",
@@ -113,25 +113,25 @@
             "description": "Associate labels explicitly with their controls",
             "name": "hasLabels",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AA"
         },
         "AX_20": {
             "description": "Until user agents provide the ability to stop the refresh, do not create periodically auto-refreshing / auto re-direct pages",
             "name": "hasAutoRefresh",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_21": {
             "description": "Until user agents allow users to turn off spawned windows, do not cause pop-ups or other windows to appear and do not change the current window without informing the user.",
             "name": "isOpeningInNewTabOrPopUp",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_22": {
             "description": "Ensure that pages are usable when scripts, applets, or other programmatic objects are turned off or not supported. If this is not possible, provide equivalent information on an alternative accessible page",
             "name": "hasNoScriptTag",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_23": {
             "description": "Provide keyboard shortcuts to important links (including those in client-side image maps), form controls, and groups of form controls",
@@ -143,61 +143,61 @@
             "description": "Check if there is atleast one header section / element for the page content that defines its purpose & context",
             "name": "hasHeaderElementDefined",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_25": {
             "description": "role=main must be present on significant elements only",
             "name": "isRoleMainOnSignificantElement",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_26": {
             "description": "Provide metadata to add semantic information to pages and sites. Check if there is a meta tag with charset, keywords, description, author, copyright attributes defined",
             "name": "hasRequiredMetaAttributes",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_27": {
             "description": "Check if there is a link that helps skip irrelevant information and land the user at the main content",
             "name": "hasLinkToSkipToMainContent",
             "isGlobal": "true",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_28": {
             "description": "Check if PRE elements are used. Ensure that there are no TABLE based layouts in it",
             "name": "isPreElementUsed",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AA"
         },
         "AX_29": {
             "description": "Don't use the <B> and <I> tags. They are used to create a visual presentation effect",
             "name": "isBorIElementUsed",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AAA"
         },
         "AX_30": {
             "description": "Provide text equivalent for every non-text element like OBJECT",
             "name": "hasTextEquivalent",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_31": {
             "description": "Ensure that equivalents for dynamic content are updated when the dynamic content changes. As the contents of a frame changes, so must change any description. This is not possible if an IMG is inserted directly into a frame. Thus, content developers should always make the source ('src') of a frame an HTML file",
             "name": "hasImgInSrcOfUrl",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_32": {
             "description": "Use FIELDSET to group form controls into semantic units",
             "name": "isFormElementInsideFieldSet",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_33": {
             "description": "Describe the FIELDSET group with the LEGEND element.",
             "name": "isFieldsetContainsLegend",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "A"
         },
         "AX_34": {
             "description": "Check for presence of a DOCTYPE",
@@ -209,7 +209,19 @@
             "description": "Table TD tags are to be associated to corresponding TH header tags of the table via the headers attribute",
             "name": "hasHeadersAttribute",
             "isGlobal": "false",
-            "compliance": ""
+            "compliance": "AA"
+        },
+        "AX_36": {
+            "description": "Any element that has click, double click handlers must be focusable and not hidden",
+            "name": "isFocusibleOnClickAndDoubleClick",
+            "isGlobal": "false",
+            "compliance": "A"
+        },
+        "AX_37": {
+            "description": "Anchor element with target _blank should have an hidden label opens in a new window ot tab",
+            "name": "anchorWithTargetblank",
+            "isGlobal": "false",
+            "compliance": "AA"
         }
     }
 }

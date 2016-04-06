@@ -22,7 +22,7 @@ var expect = chai.expect;
 var AX_37 = proxyquire('../.coverage/instrument/lib/rulesImpl/AX_37', {jquery:$});
 
 //> mocha -setup describing the test suite
-describe.only('AX_37', function() {
+describe('AX_37', function() {
 
     //> Test case : 1
     it('should pass if anchor element with hidden label opens in a new window when target attribute is blank', function() {

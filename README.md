@@ -44,7 +44,9 @@
 
 > This a11y project is an implementation of accessibility rules as defined in [W3C Accessibility Checklist](http://www.w3.org/TR/WCAG10/full-checklist.html)
 
-> Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests phase itself. [chai-a11y](https://github.com/pranavjha/chai-a11y) provides a BDD style `to.be.accessible()` interface for asserting a11y audits. This audit, helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
+> Accessibility testing happens on products after they are deployed onto staging and relies on the QA folks. This project along with [chai-a11y](https://github.com/pranavjha/chai-a11y) helps to include accessibility testing as part of the unit tests phase itself.
+
+> [chai-a11y](https://github.com/pranavjha/chai-a11y) provides a BDD style `to.be.accessible()` interface for asserting a11y audits. This audit, helps in cutting down lead time by eliminating dependency over the QA deployments. Accessibility issues can now be spotted in the development phase itself.
 
 > Recursively conducts accessibility audits on HTML partials / snippets / mocked HTML response (inclusive of child nodes)
 
@@ -70,17 +72,19 @@ require the module as require('a11y-auditor') and add it to the dependencies. Th
 ```
 var auditRunner = require('a11y-auditor');
 
-var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
+var result = auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 ```
 
 
 #### For Browser usage (include <script...> and run without AMD):
 ---------------------------------------------------------
-Use the distribution file at dist/browser/main.js. Implement it as :
+Use the distribution file at `dist/browser/a11y-auditor.min.js`. This comes bundled with dependencies like `jQuery (v 2.2.0)`, `lodash (4.3.0)`. However, if you just want the source file alone, its available at `dist/browser/a11y-auditor.min.only.js`
+
+Implement it as :
 
 ```
 window.onload = function(){
-		auditRunner(htmlSelector, rulesConfig, auditConfig);
+		window.auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 }
 ```
 But its recommended to use a11y-auditor with the chai-a11y plugin that provides BDD style `to.be.accessible()` interface via chai and can be integrated with mocha tests and run on development machines and CI.
@@ -97,10 +101,10 @@ It is possible to run a grunt workflow via MAVEN builds using the [Front end mav
 The a11y-auditor has a command line runner to conduct the audit on static HTML files and on any URL's directly. To use the runner, install phantomjs then run the following command from the project root directory.
 
 ```
-$ phantomjs path/to/phantomRunner.js <path-to-StaticFile-or-URL> <path-To-A11yAuditor-Distribution-File> <path-to-outPutFile>
+$ phantomjs phantomRunner/phantomRunner.js <path-to-StaticFile-or-URL> <path-To-A11yAuditor-Distribution-File> <path-to-outPutFile>
 
 ```
-
+The `phantomRunner.js` can be found at `phantomRunner/phantomRunner.js` in the repo.
 
 #### Method definition of method exported by the Module :
 --------------------------------------------------
@@ -110,41 +114,63 @@ The method takes in 3 parameters:
 ```
 var auditRunner = require('a11y-auditor');
 
-var result = auditRunner(htmlSelector, rulesConfig, auditConfig);
+var result = auditRunner.run(htmlSelector, rulesConfig, auditConfig);
 
 ```
 
-1. **htmlSelector or DOM object** - A valid HTML selector or a DOM object (containing child nodes is also cool) (eg. 'button')
+1. **htmlSelector or DOM object** - A valid HTML selector or a DOM object or a jquery DOM object (containing child nodes is also cool) (eg. 'button')
 2. **rulesConfig** - A config obj containing rules to be ignored for some elements matched by valid HTML selectors as shown below
 3. **auditConfig** - A config obj for the a11y-auditor that governs compliance, global rules execution etc.,
 
-auditConfig takes in 2 properties / keys :
+`auditConfig` takes in 3 properties / keys :
 
 - *'executeGlobalRules'*: A Boolean to indicate whether global rules that audit the whole document need to be ignored.
-- *'compliance'* : Takes one of the 3 strings : 'A', 'AA', 'AAA'.
+- *'compliance'* : Takes an array, containing values from : `'A', 'AA', 'AAA'`
+- *'displayOptions'* : Takes one of the values ` 'error', 'warning', 'errAndWarn' `
 
 
 
 #### To ignore a few rules :
 -----------------------
+Rules can be ignored by passing the `ruleID` or the `short name` of the rule.
 
 `As an example :`
 
 ```
-function(“img”, {
-	‘img’ : [‘AX_01’, 'AX_04'],
+window.auditRunner.run(“img”, {
+	‘img’ : [‘imageWithoutAltText'],
 	‘#sampleId1’ : [‘AX_22’, 'AX_33'],
 	‘title’ : [‘*’] //* will skip all rules for the selector
 },{
 	executeGlobalRules : true,
-	compliance : 'AA'
+	compliance : ['AA'],
+	displayOptions : 'errAndWarn'
 	});
 
 ```
+In the above example, for the selector `#sampleId1`, rules `AX_22` and `AX_33` are skipped.
+And, `AA` compliance is only tested for.
+For all objects corresponding to `img` selector, the `imageWithoutAltText` is skipped.
+Since the `displayOptions` is set to `errAndWarn`, all errors and Warnings are shown.
 
-**Note :** If there is no HTML partial object or selector passed, it will perform the audit for the whole document
+**Note :** If there is no HTML partial object or selector passed, it will perform the audit for the whole document, under the assumption that `a11y-auditor.min.js` is included inside an HTML document.
 
 
+#### To execute only a selected few rules :
+-----------------------
+Only a select set of few rules can be executed on a given selector or DOM object.
+
+`As an example :`
+
+```
+window.auditRunner.runOnly(“img”, {
+	‘img’ : [‘imageWithoutAltText']
+});
+
+```
+
+In the above example, for the selector `img`, only the rule `imageWithoutAltText` is executed.
+Any other valid rules which may exist for this selector, is just ignored. This helps to run targeted rules on components or widgets. Also, only the first element matching the selector is used to run this test on.
 
 #### To author new rules :
 ---------------------------------------------------------
@@ -160,7 +186,7 @@ module.exports = {
 	tagName: ['comma separated array of tagNames'], // the rule will execute for the tags mentioned here
 	handler: function(){/* Your implementation here */},
 	isGlobal: Boolean //to indicate if this rule checks on document level checks,
-	compliance : 'AA'
+	compliance : ['AA']
 };
 
 ```
@@ -171,7 +197,7 @@ module.exports = {
 2. [] - if its a Global Rule as its not tag specific and will execute just once for the document.
 3. ['\*'] - if its to execute for all tags
 
-`compliance` can take : A, AA, AAA
+`compliance` can take values from : A, AA, AAA
 
 `isGlobal` can take : true / false
 
@@ -262,6 +288,7 @@ Grunt, grunt-mocha-test, Chai, grunt-browserify, jsdom, grunt-istanbul, grunt-co
 #### Ideation & Contributors :
 --------------------
 [@pranavjha](https://github.com/pranavjha/)
+[@gopalj](https://github.com/gopalj)
 
 
 #### License
