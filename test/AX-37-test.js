@@ -56,8 +56,23 @@ describe('AX_37', function() {
         expect(result.TYPE).to.equal('error');
     });
 
-
     //> Test case : 3
+    it('should pass if anchor element is not having target attribute', function() {
+        //build the required implementation
+        var document = window.document;
+        var aTarget = document.createElement('a');
+        aTarget.setAttribute('href', 'http://api.jquery.com/jquery-wp-content/themes/jquery/images/logo-jquery.png');        
+        aTarget.appendChild(document.createTextNode('Click Here'));
+
+        //invoke the handler of the rule
+        var result = AX_37.handler.call(null, aTarget);
+
+        //validate the result
+        expect(result.RESULT).to.equal(true);
+    });
+
+
+    //> Test case : 4
     it('should not be a global rule', function() {
         expect(AX_37.isGlobal).to.equal(false);
     });
